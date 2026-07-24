@@ -1,0 +1,12 @@
+build/
+out/
+.vs/
+.vscode/
+.idea/
+.agents/
+.codex/
+cmake-build-*/
+*.user
+*.suo
+*.obj
+*.exe

@@ -1,0 +1,28 @@
+#pragma once
+
+#include "library/book.hpp"
+
+#include <optional>
+#include <string_view>
+#include <vector>
+
+namespace library {
+
+class LibraryService {
+public:
+    bool add_book(Book book);
+    bool remove_book(int id);
+    bool borrow_book(int id);
+    bool return_book(int id);
+
+    [[nodiscard]] std::optional<Book> find_by_id(int id) const;
+    [[nodiscard]] std::vector<Book> search_by_title(std::string_view keyword) const;
+    [[nodiscard]] std::vector<Book> books_sorted_by_year() const;
+    [[nodiscard]] const std::vector<Book>& all_books() const noexcept;
+
+private:
+    std::vector<Book> books_;
+};
+
+}  // namespace library
+
