@@ -59,3 +59,4 @@ ctest --preset default
 ## 学习记录
 
 - 完成 Git 分支、合并和推送练习。
+- 第二次练习 Git 合并和推送。
