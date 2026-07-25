@@ -13,6 +13,7 @@ namespace {
             << "2. Add book\n"
             << "3. Borrow book\n"
             << "4. Return book\n"
+            << "5. Remove book\n"
             << "0. Exit\n"
             << "Choose: ";
     }
@@ -55,11 +56,19 @@ namespace {
             success = service.borrow_book(id);
         }
         else {
-			success = service.return_book(id);
+            success = service.return_book(id);
         }
         std::cout << (success ? "Done.\n" : "Operation failed.\n");
-        }
-    } // namespace
+    }
+
+    void remove_book_from_library(library::LibraryService& service) {
+        int id{};
+        std::cout << "Book id: ";
+        std::cin >> id;
+        const bool success = service.remove_book(id);
+        std::cout << (success ? "Book removed.\n" : "Book not found.\n");
+    }
+}  // namespace
 
 int main() {
     library::LibraryService service;
@@ -87,6 +96,9 @@ int main() {
             break;
         case 4:
             update_borrow_status(service, false);
+            break;
+        case 5:
+            remove_book_from_library(service);
             break;
         default:
             std::cout << "Unknown choice.\n";

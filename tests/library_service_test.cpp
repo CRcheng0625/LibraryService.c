@@ -50,12 +50,25 @@ void test_search_and_sort() {
            "books should be sorted by publication year");
 }
 
+void test_remove_book() {
+    library::LibraryService service;
+    service.add_book({10, "The Book", "Test Author", 2024, false});
+
+    expect(service.remove_book(10),
+           "an existing book should be removed");
+    expect(!service.find_by_id(10).has_value(),
+           "a removed book should no longer be found");
+    expect(!service.remove_book(99),
+           "removing a missing book should fail");
+}
+
 }  // namespace
 
 int main() {
     test_add_and_find_book();
     test_borrow_and_return_book();
     test_search_and_sort();
+    test_remove_book();
 
     if (failures == 0) {
         std::cout << "All tests passed.\n";
@@ -65,4 +78,3 @@ int main() {
     std::cerr << failures << " test(s) failed.\n";
     return EXIT_FAILURE;
 }
-
