@@ -7,54 +7,59 @@
 
 namespace {
 
-void print_menu() {
-    std::cout << "\nLibrary manager\n"
-              << "1. List books\n"
-              << "2. Add book\n"
-              << "3. Borrow book\n"
-              << "4. Return book\n"
-              << "0. Exit\n"
-              << "Choose: ";
-}
-
-void list_books(const library::LibraryService& service) {
-    if (service.all_books().empty()) {
-        std::cout << "No books yet.\n";
-        return;
+    void print_menu() {
+        std::cout << "\nLibrary manager\n"
+            << "1. List books\n"
+            << "2. Add book\n"
+            << "3. Borrow book\n"
+            << "4. Return book\n"
+            << "0. Exit\n"
+            << "Choose: ";
     }
 
-    for (const auto& book : service.all_books()) {
-        std::cout << book.id << " | " << book.title << " | " << book.author << " | "
-                  << book.publication_year << " | "
-                  << (book.borrowed ? "borrowed" : "available") << '\n';
+    void list_books(const library::LibraryService& service) {
+        if (service.all_books().empty()) {
+            std::cout << "No books yet.\n";
+            return;
+        }
+
+        for (const auto& book : service.all_books()) {
+            std::cout << book.id << " | " << book.title << " | " << book.author << " | "
+                << book.publication_year << " | "
+                << (book.borrowed ? "borrowed" : "available") << '\n';
+        }
     }
-}
 
-void add_book(library::LibraryService& service) {
-    library::Book book;
-    std::cout << "Id: ";
-    std::cin >> book.id;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    void add_book(library::LibraryService& service) {
+        library::Book book;
+        std::cout << "Id: ";
+        std::cin >> book.id;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    std::cout << "Title: ";
-    std::getline(std::cin, book.title);
-    std::cout << "Author: ";
-    std::getline(std::cin, book.author);
-    std::cout << "Publication year: ";
-    std::cin >> book.publication_year;
+        std::cout << "Title: ";
+        std::getline(std::cin, book.title);
+        std::cout << "Author: ";
+        std::getline(std::cin, book.author);
+        std::cout << "Publication year: ";
+        std::cin >> book.publication_year;
 
-    std::cout << (service.add_book(std::move(book)) ? "Book added.\n" : "Invalid or duplicate book.\n");
-}
+        std::cout << (service.add_book(std::move(book)) ? "Book added.\n" : "Invalid or duplicate book.\n");
+    }
 
-void update_borrow_status(library::LibraryService& service, bool borrow) {
-    int id{};
-    std::cout << "Book id: ";
-    std::cin >> id;
-    const bool success = borrow ? service.borrow_book(id) : service.return_book(id);
-    std::cout << (success ? "Done.\n" : "Operation failed.\n");
-}
-
-}  // namespace
+    void update_borrow_status(library::LibraryService& service, bool borrow) {
+        int id{};
+        std::cout << "Book id: ";
+        std::cin >> id;
+        bool success{};
+        if (borrow) {
+            success = service.borrow_book(id);
+        }
+        else {
+			success = service.return_book(id);
+        }
+        std::cout << (success ? "Done.\n" : "Operation failed.\n");
+        }
+    } // namespace
 
 int main() {
     library::LibraryService service;
