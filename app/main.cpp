@@ -14,6 +14,7 @@ namespace {
             << "3. Borrow book\n"
             << "4. Return book\n"
             << "5. Remove book\n"
+            << "6. Search by title\n"
             << "0. Exit\n"
             << "Choose: ";
     }
@@ -68,6 +69,27 @@ namespace {
         const bool success = service.remove_book(id);
         std::cout << (success ? "Book removed.\n" : "Book not found.\n");
     }
+
+    void search_books_by_title(const library::LibraryService& service) {
+        std::string keyword;
+        std::cout << "Title keyword: ";
+
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::getline(std::cin, keyword);
+
+        const auto matches = service.search_by_title(keyword);
+
+        std::cout << "Matches: " << matches.size() << "\n";
+
+        for (const auto& book : matches) {
+            std::cout << book.id << " | "
+                << book.title << " | "
+                << book.author << " | "
+                << book.publication_year << " | "
+                << (book.borrowed ? "borrowed" : "available")
+                << '\n';
+        }
+    }
 }  // namespace
 
 int main() {
@@ -99,6 +121,9 @@ int main() {
             break;
         case 5:
             remove_book_from_library(service);
+            break;
+        case 6:
+            search_books_by_title(service);
             break;
         default:
             std::cout << "Unknown choice.\n";

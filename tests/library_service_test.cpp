@@ -42,6 +42,9 @@ void test_search_and_sort() {
     service.add_book({2, "C++ Primer", "Stanley Lippman", 2012, false});
     service.add_book({3, "Introduction to Algorithms", "Thomas Cormen", 2009, false});
 
+    expect(service.search_by_title("Python").empty(),
+           "a missing title should produce no matches");
+
     expect(service.search_by_title("ALGORITHMS").size() == 2,
            "title search should be case insensitive");
 
