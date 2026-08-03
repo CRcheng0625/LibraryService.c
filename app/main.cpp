@@ -19,6 +19,15 @@ namespace {
             << "Choose: ";
     }
 
+    void print_book(const library::Book& book) {
+        std::cout << book.id << " | "
+            << book.title << " | "
+            << book.author << " | "
+            << book.publication_year << " | "
+            << (book.borrowed ? "borrowed" : "available")
+            << '\n';
+    }
+    
     void list_books(const library::LibraryService& service) {
         if (service.all_books().empty()) {
             std::cout << "No books yet.\n";
@@ -26,9 +35,7 @@ namespace {
         }
 
         for (const auto& book : service.all_books()) {
-            std::cout << book.id << " | " << book.title << " | " << book.author << " | "
-                << book.publication_year << " | "
-                << (book.borrowed ? "borrowed" : "available") << '\n';
+            print_book(book);
         }
     }
 
@@ -82,12 +89,7 @@ namespace {
         std::cout << "Matches: " << matches.size() << "\n";
 
         for (const auto& book : matches) {
-            std::cout << book.id << " | "
-                << book.title << " | "
-                << book.author << " | "
-                << book.publication_year << " | "
-                << (book.borrowed ? "borrowed" : "available")
-                << '\n';
+            print_book(book);
         }
     }
 }  // namespace
