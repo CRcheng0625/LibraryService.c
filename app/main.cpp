@@ -15,6 +15,7 @@ namespace {
             << "4. Return book\n"
             << "5. Remove book\n"
             << "6. Search by title\n"
+            << "7. Find book by id\n"
             << "0. Exit\n"
             << "Choose: ";
     }
@@ -92,6 +93,21 @@ namespace {
             print_book(book);
         }
     }
+
+    void find_book_by_id(const library::LibraryService& service) {
+        int id{};
+        std::cout << "Book id: ";
+        std::cin >> id;
+
+        const auto book = service.find_by_id(id);
+        if (!book.has_value()) {
+            std::cout << "Book not found.\n";
+            return;
+        }
+
+        print_book(book.value());
+    }
+
 }  // namespace
 
 int main() {
@@ -126,6 +142,9 @@ int main() {
             break;
         case 6:
             search_books_by_title(service);
+            break;
+        case 7:
+            find_book_by_id(service);
             break;
         default:
             std::cout << "Unknown choice.\n";
