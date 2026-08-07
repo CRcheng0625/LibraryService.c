@@ -7,6 +7,17 @@
 
 namespace {
 
+    bool read_int(int& value) {
+        if (std::cin >> value) {
+            return true;
+        }
+
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Please enter a number.\n";
+        return false;
+    }
+
     void print_menu() {
         std::cout << "\nLibrary manager\n"
             << "1. List books\n"
@@ -45,7 +56,9 @@ namespace {
     void add_book(library::LibraryService& service) {
         library::Book book;
         std::cout << "Id: ";
-        std::cin >> book.id;
+        if (!read_int(book.id)) {
+            return;
+        }
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         std::cout << "Title: ";
@@ -53,7 +66,9 @@ namespace {
         std::cout << "Author: ";
         std::getline(std::cin, book.author);
         std::cout << "Publication year: ";
-        std::cin >> book.publication_year;
+        if (!read_int(book.publication_year)) {
+            return;
+        }
 
         std::cout << (service.add_book(std::move(book)) ? "Book added.\n" : "Invalid or duplicate book.\n");
     }
@@ -61,7 +76,9 @@ namespace {
     void update_borrow_status(library::LibraryService& service, bool borrow) {
         int id{};
         std::cout << "Book id: ";
-        std::cin >> id;
+        if (!read_int(id)) {
+            return;
+        }
         bool success{};
         if (borrow) {
             success = service.borrow_book(id);
@@ -75,7 +92,9 @@ namespace {
     void remove_book_from_library(library::LibraryService& service) {
         int id{};
         std::cout << "Book id: ";
-        std::cin >> id;
+        if (!read_int(id)) {
+            return;
+        }
         const bool success = service.remove_book(id);
         std::cout << (success ? "Book removed.\n" : "Book not found.\n");
     }
@@ -99,7 +118,10 @@ namespace {
     void find_book_by_id(const library::LibraryService& service) {
         int id{};
         std::cout << "Book id: ";
-        std::cin >> id;
+
+        if (!read_int(id)) {
+            return;
+        }
 
         const auto book = service.find_by_id(id);
         if (!book.has_value()) {
@@ -144,9 +166,8 @@ int main() {
     while (true) {
         print_menu();
         int choice{};
-        if (!(std::cin >> choice)) {
-            std::cout << "Please enter a number.\n";
-            return 1;
+        if (!read_int(choice)) {
+            continue;
         }
 
         switch (choice) {
