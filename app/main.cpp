@@ -17,6 +17,7 @@ namespace {
             << "6. Search by title\n"
             << "7. Find book by id\n"
             << "8. List books by year\n"
+            << "9. List available books\n"
             << "0. Exit\n"
             << "Choose: ";
     }
@@ -121,6 +122,19 @@ namespace {
             print_book(book);
         }
     }
+
+    void list_available_books(const library::LibraryService& service) {
+        const auto books = service.available_books();
+
+        if (books.empty()) {
+            std::cout << "No available books.\n";
+            return;
+        }
+
+        for (const auto& book : books) {
+            print_book(book);
+        }
+    }
 }  // namespace
 
 int main() {
@@ -161,6 +175,9 @@ int main() {
             break;
         case 8:
             list_books_by_year(service);
+            break;
+        case 9:
+            list_available_books(service);
             break;
         default:
             std::cout << "Unknown choice.\n";
