@@ -18,6 +18,7 @@ public:
     [[nodiscard]] std::optional<Book> find_by_id(int id) const;
     [[nodiscard]] std::vector<Book> search_by_title(std::string_view keyword) const;
     [[nodiscard]] std::vector<Book> books_sorted_by_year() const;
+    [[nodiscard]] std::vector<Book> available_books() const;
     [[nodiscard]] const std::vector<Book>& all_books() const noexcept;
 
 private:

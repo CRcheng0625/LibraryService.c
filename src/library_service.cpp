@@ -95,4 +95,14 @@ const std::vector<Book>& LibraryService::all_books() const noexcept {
     return books_;
 }
 
+std::vector<Book> LibraryService::available_books() const {
+    std::vector<Book> result;
+    for (const auto& book : books_) {
+        if (!book.borrowed) {
+            result.push_back(book);
+        }
+    }
+    return result;
+}
+
 }  // namespace library

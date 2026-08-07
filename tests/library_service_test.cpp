@@ -65,6 +65,19 @@ void test_remove_book() {
            "removing a missing book should fail");
 }
 
+void test_available_books() {
+    library::LibraryService service;
+    service.add_book({ 1,"Available","Author",2020,false });
+    service.add_book({ 2,"Borrowed","Author",2021,false });
+    service.borrow_book(2);
+
+    const auto books = service.available_books();
+
+    expect(books.size() == 1,
+        "only available books should be returned");
+    expect(books.front().id == 1,
+        "the available book should be returned");
+}
 }  // namespace
 
 int main() {
@@ -72,6 +85,7 @@ int main() {
     test_borrow_and_return_book();
     test_search_and_sort();
     test_remove_book();
+    test_available_books();
 
     if (failures == 0) {
         std::cout << "All tests passed.\n";
