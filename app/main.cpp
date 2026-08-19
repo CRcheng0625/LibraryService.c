@@ -124,12 +124,12 @@ namespace {
         }
 
         const auto book = service.find_by_id(id);
-        if (!book.has_value()) {
+        if (!book) {
             std::cout << "Book not found.\n";
             return;
         }
 
-        print_book(book.value());
+        print_book(*book);
     }
 
     void list_books_by_year(const library::LibraryService& service) {

@@ -78,6 +78,27 @@ void test_available_books() {
     expect(books.front().id == 1,
         "the available book should be returned");
 }
+
+void test_find_missing_book() {
+    library::LibraryService service;
+    service.add_book({1, "C++ Primer", "Stanley Lippman", 2012, false});
+
+    const auto missing_book = service.find_by_id(99);
+
+    expect(!missing_book,
+        "a missing id should return an empty optional");
+
+    const auto book = service.find_by_id(1);
+
+    expect(book.has_value(),
+           "an existing book should be found");
+
+    if (book) {
+        expect(book->title == "C++ Primer",
+            "the found book should have the expected title");
+    }
+}
+
 }  // namespace
 
 int main() {
@@ -86,6 +107,7 @@ int main() {
     test_search_and_sort();
     test_remove_book();
     test_available_books();
+    test_find_missing_book();
 
     if (failures == 0) {
         std::cout << "All tests passed.\n";
