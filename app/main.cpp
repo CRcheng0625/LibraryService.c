@@ -29,6 +29,7 @@ namespace {
             << "7. Find book by id\n"
             << "8. List books by year\n"
             << "9. List available books\n"
+            << "10. Search by author\n"
             << "0. Exit\n"
             << "Choose: ";
     }
@@ -157,6 +158,25 @@ namespace {
             print_book(book);
         }
     }
+
+    void search_books_by_author(
+        const library::LibraryService& service) {
+        std::string keyword;
+        std::cout << "Author keyword: ";
+
+        std::cin.ignore(
+            std::numeric_limits<std::streamsize>::max(),
+            '\n');
+        std::getline(std::cin, keyword);
+
+        const auto matches = service.search_by_author(keyword);
+
+        std::cout << "Matches: " << matches.size() << "\n";
+
+        for (const auto& book : matches) {
+            print_book(book);
+        }
+    }
 }  // namespace
 
 int main() {
@@ -199,6 +219,9 @@ int main() {
             break;
         case 9:
             list_available_books(service);
+            break;
+        case 10:
+            search_books_by_author(service);
             break;
         default:
             std::cout << "Unknown choice.\n";

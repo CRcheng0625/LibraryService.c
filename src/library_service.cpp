@@ -83,6 +83,23 @@ std::vector<Book> LibraryService::search_by_title(std::string_view keyword) cons
     return matches;
 }
 
+std::vector<Book> LibraryService::search_by_author(
+    std::string_view keyword) const {
+    const std::string normalized_keyword = to_lower(keyword);
+    std::vector<Book> matches;
+
+    std::copy_if(
+        books_.begin(),
+        books_.end(),
+        std::back_inserter(matches),
+        [&normalized_keyword](const Book& book) {
+            return to_lower(book.author).find(normalized_keyword)
+                != std::string::npos;
+        });
+
+    return matches;
+}
+
 std::vector<Book> LibraryService::books_sorted_by_year() const {
     std::vector<Book> result = books_;
     std::stable_sort(result.begin(), result.end(), [](const Book& left, const Book& right) {

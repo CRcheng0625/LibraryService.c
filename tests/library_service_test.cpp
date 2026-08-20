@@ -51,6 +51,16 @@ void test_search_and_sort() {
     const auto sorted = service.books_sorted_by_year();
     expect(sorted.size() == 3 && sorted.front().publication_year == 2009,
            "books should be sorted by publication year");
+
+    const auto author_matches =
+        service.search_by_author("cormen");
+
+    expect(author_matches.size() == 1 &&
+        author_matches.front().id == 3,
+        "author search should find the matching book");
+
+    expect(service.search_by_author("LIPPMAN").size() == 1,
+        "author search should be case insensitive");
 }
 
 void test_remove_book() {
