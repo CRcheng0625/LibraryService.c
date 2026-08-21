@@ -19,8 +19,15 @@ void test_add_and_find_book() {
     library::LibraryService service;
     expect(service.add_book({1, "Clean Code", "Robert C. Martin", 2008, false}),
            "a valid book should be added");
+
+    expect(service.all_books().size() == 1,
+        "adding one book should increase the book count to one");
+
     expect(!service.add_book({1, "Duplicate", "Someone", 2020, false}),
            "duplicate ids should be rejected");
+
+    expect(service.all_books().size() == 1,
+        "rejecting a duplicate id should not change the book count");
 
     const auto book = service.find_by_id(1);
     expect(book.has_value(), "an existing book should be found");
@@ -89,6 +96,23 @@ void test_available_books() {
         "the available book should be returned");
 }
 
+void test_borrow_missing_book() {
+    // Arrange
+    library::LibraryService service;
+    service.add_book({ 1, "C++ Primer", "Stanley Lippman", 2012, false });
+
+    // Act
+    const bool success = service.borrow_book(99);
+
+    // Assert
+    expect(!success,
+        "borrowing a missing book should fail");
+
+    const auto existing_book = service.find_by_id(1);
+    expect(existing_book && !existing_book->borrowed,
+        "borrowing a missing id should not affect existing books");
+}
+
 void test_find_missing_book() {
     library::LibraryService service;
     service.add_book({1, "C++ Primer", "Stanley Lippman", 2012, false});
@@ -117,6 +141,7 @@ int main() {
     test_search_and_sort();
     test_remove_book();
     test_available_books();
+    test_borrow_missing_book();
     test_find_missing_book();
 
     if (failures == 0) {
