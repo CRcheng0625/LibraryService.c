@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(library_core
     src/library_service.cpp
+    src/book_storage.cpp
 )
 
 target_include_directories(library_core
