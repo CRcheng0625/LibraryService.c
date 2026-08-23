@@ -200,6 +200,30 @@ namespace {
         }
     }
     
+    void search_by_author_and_year(
+        const library::LibraryService& service) {
+		std::string keyword;
+        std::cout << "Author keyword: ";
+
+        std::cin.ignore(
+            std::numeric_limits<std::streamsize>::max(),
+            '\n');
+        std::getline(std::cin, keyword);
+
+        int year{};
+        std::cout << "Publication year: ";
+
+        if (!read_int(year)) {
+            return;
+        }
+
+        const auto matches = service.search_by_author_and_year(keyword, year);
+        std::cout << "Matches: " << matches.size() << "\n";
+
+        for (const auto& book : matches) {
+            print_book(book);
+        }
+    }
 }  // namespace
 
 int main() {

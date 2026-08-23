@@ -19,6 +19,7 @@ public:
     [[nodiscard]] std::vector<Book> search_by_title(std::string_view keyword) const;
     [[nodiscard]] std::vector<Book> search_by_author(std::string_view keyword) const;
     [[nodiscard]] std::vector<Book> search_by_year(int year) const;
+	[[nodiscard]] std::vector<Book> search_by_author_and_year(std::string_view author, int year) const;
 
     [[nodiscard]] std::vector<Book> books_sorted_by_year() const;
     [[nodiscard]] std::vector<Book> available_books() const;

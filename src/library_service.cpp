@@ -130,4 +130,17 @@ std::vector<Book> LibraryService::available_books() const {
     return result;
 }
 
+std::vector<Book> LibraryService::search_by_author_and_year(std::string_view author, int year) const {
+    const std::string normalized_author = to_lower(author);
+    std::vector<Book> matches;
+    std::copy_if(
+        books_.begin(), books_.end(), std::back_inserter(matches),
+        [&normalized_author, year](const Book& book) {
+            return to_lower(book.author).find(normalized_author) != std::string::npos &&
+                   book.publication_year == year;
+        }
+    );
+    return matches;
+}
+
 }  // namespace library

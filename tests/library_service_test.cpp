@@ -81,6 +81,16 @@ void test_search_and_sort() {
 
     expect(service.search_by_year(1990).empty(),
 		"year search should return no matches for an unknown year");
+
+    const auto combined_matches =
+        service.search_by_author_and_year("LIPPMAN", 2012);
+
+    expect(combined_matches.size() == 1 &&
+               combined_matches.front().id == 2,
+           "combined search should match author and year");
+
+    expect(service.search_by_author_and_year("LIPPMAN", 1990).empty(),
+           "combined search should require both author and year");
 }
 
 void test_remove_book() {
