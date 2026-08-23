@@ -100,6 +100,14 @@ std::vector<Book> LibraryService::search_by_author(
     return matches;
 }
 
+std::vector<Book> LibraryService::search_by_year(int year) const {
+	std::vector<Book> matches;
+	std::copy_if(
+        books_.begin(), books_.end(), std::back_inserter(matches),
+		[year](const Book& book) { return book.publication_year == year; });
+	return matches;
+}
+
 std::vector<Book> LibraryService::books_sorted_by_year() const {
     std::vector<Book> result = books_;
     std::stable_sort(result.begin(), result.end(), [](const Book& left, const Book& right) {

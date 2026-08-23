@@ -73,6 +73,14 @@ void test_search_and_sort() {
 
     expect(service.search_by_author("LIPPMAN").size() == 1,
         "author search should be case insensitive");
+
+	const auto year_matches = service.search_by_year(2012);
+
+    expect(year_matches.size() == 1 && year_matches.front().id == 2,
+        "year search should find the matching books");
+
+    expect(service.search_by_year(1990).empty(),
+		"year search should return no matches for an unknown year");
 }
 
 void test_remove_book() {
