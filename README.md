@@ -1,62 +1,93 @@
 # My First C++ Project
 
-这是一个用于学习现代 C++、数据结构和基础工程实践的命令行图书管理项目。
+这是一个用于学习现代 C++ 和基础工程实践的命令行图书管理项目。项目从一个简单的 `vector<Book>` 开始，逐步加入业务类、STL 算法、CMake、单元测试、调试、Git 工作流和文件持久化。
+
+## 当前功能
+
+- 添加、删除图书
+- 借书和还书
+- 按 ID 查找图书
+- 按标题或作者关键词搜索，忽略大小写
+- 按出版年份查询和排序
+- 按作者与出版年份组合查询
+- 启动时从 `books.txt` 读取数据，退出时保存数据
+- 使用 CTest 运行自动化测试
 
 ## 项目结构
 
 ```text
 my first project/
-├── app/                 # 程序入口和用户交互
-├── include/library/     # 对外头文件：数据模型与业务接口
-├── src/                 # 业务实现
-├── tests/               # 自动化测试
-├── docs/                # 学习任务与设计说明
-├── CMakeLists.txt       # 构建规则
-└── CMakePresets.json    # 统一的本地构建配置
+├── app/
+│   └── main.cpp                    # 命令行界面和程序入口
+├── include/library/
+│   ├── book.hpp                    # Book 数据类型
+│   ├── book_storage.hpp            # 文件持久化接口
+│   └── library_service.hpp         # 图书业务接口
+├── src/
+│   ├── book_storage.cpp            # 文件读写实现
+│   └── library_service.cpp         # 图书业务实现
+├── tests/
+│   └── library_service_test.cpp    # 单元测试
+├── docs/
+│   └── learning-roadmap.md         # 学习路线和练习记录
+├── CMakeLists.txt                  # CMake 构建规则
+└── CMakePresets.json               # 默认构建预设
 ```
 
-依赖方向是 `app -> library_core`，测试也只依赖 `library_core`。这样用户界面、业务逻辑和测试不会混在一个文件里。
+依赖关系如下：
 
-## 需要的工具
+```text
+library_service.cpp ─┐
+book_storage.cpp ────┼──> library_core
+                     ├──> library_cli
+library_service_test ─┘     library_tests
+```
 
-Windows 上推荐以下组合：
+业务逻辑位于 `library_core`，命令行程序和测试程序通过 CMake 链接这个库。
 
-1. Visual Studio 2022 Community，安装时勾选“使用 C++ 的桌面开发”。它提供 MSVC 编译器和 Windows SDK。
-2. CMake，用来生成和管理构建过程。
-3. Ninja，用来执行快速构建；当前预设使用它。
-4. Git，用来记录每一步学习和修改。
-5. Visual Studio Code（可选），安装 C/C++ 与 CMake Tools 扩展。
+## 工具
 
-如果更喜欢一个集成环境，可以直接用 Visual Studio 打开此文件夹；如果使用 VS Code，则需要单独确认编译器、CMake 和 Ninja 都在 `PATH` 中。
+Windows 开发环境需要：
 
-## 构建和运行
+- Visual Studio，包含 MSVC、Windows SDK 和 C++ CMake 工具
+- CMake
+- Ninja
+- Git
 
-在项目根目录打开 PowerShell：
+Visual Studio 已经可以提供其中的大部分组件。也可以使用其他编辑器，但必须能找到 C++ 编译器、CMake 和 Ninja。
+
+## 构建、运行和测试
+
+在项目根目录打开开发者 PowerShell 或 Visual Studio 终端：
 
 ```powershell
 cmake --preset default
 cmake --build --preset default
+ctest --preset default --output-on-failure
+```
+
+运行命令行程序：
+
+```powershell
 .\build\library_cli.exe
 ```
 
-运行测试：
+程序运行时生成的 `books.txt` 位于当前工作目录，通常是 `build/books.txt`。它是运行时数据，不应提交到 Git。
 
-```powershell
-ctest --preset default
-```
+## 推荐阅读顺序
 
-## 从哪里开始
+1. `include/library/book.hpp`：理解数据结构。
+2. `include/library/library_service.hpp`：理解业务类提供的接口。
+3. `src/library_service.cpp`：理解查找、筛选、排序和状态修改。
+4. `app/main.cpp`：理解菜单、输入处理和业务调用。
+5. `include/library/book_storage.hpp` 与 `src/book_storage.cpp`：理解文件保存和读取。
+6. `tests/library_service_test.cpp`：理解测试如何验证行为。
+7. `docs/learning-roadmap.md`：按练习路线继续扩展。
 
-1. 阅读 `include/library/book.hpp`，理解一本书包含哪些状态。
-2. 阅读 `include/library/library_service.hpp`，只看它能做什么。
-3. 阅读 `src/library_service.cpp`，再看每个功能怎么实现。
-4. 阅读 `app/main.cpp`，观察界面如何调用业务功能。
-5. 阅读并运行 `tests/library_service_test.cpp`。
-6. 按 `docs/learning-roadmap.md` 完成第一个练习。
+## 学习原则
 
-不要一开始追求图形界面、数据库或网络服务。先把一个小型命令行程序写完整、测完整，再逐层增加难度。
+先让程序运行，再逐步重构；每个功能都经过测试；每次 Git 提交只包含一个清晰的小目标。遇到不会的代码时，先说明输入、输出和执行流程，再研究实现细节。
 
-## 学习记录
+## 当前状态
 
-- 完成 Git 分支、合并和推送练习。
-- 第二次练习 Git 合并和推送。
+第一阶段学习项目已经完成，主线包含核心图书功能、CMake 模块化、CTest 测试、Git 工作流和文件持久化。下一阶段重点是减少提示，独立完成需求拆解、实现、测试和提交。
