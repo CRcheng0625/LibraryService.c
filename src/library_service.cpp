@@ -143,4 +143,14 @@ std::vector<Book> LibraryService::search_by_author_and_year(std::string_view aut
     return matches;
 }
 
+std::vector<Book> LibraryService::search_by_borrowed(bool borrowed) const {
+    std::vector<Book> matches;
+    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
+        [borrowed](const Book& book) {
+            return book.borrowed == borrowed;
+        }
+    );
+    return matches;
+}
+
 }  // namespace library

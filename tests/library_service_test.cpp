@@ -82,6 +82,23 @@ void test_search_and_sort() {
     expect(service.search_by_year(1990).empty(),
 		"year search should return no matches for an unknown year");
 
+
+    expect(service.borrow_book(2),
+           "a test book should be borrowable");
+
+    const auto borrowed_matches =
+        service.search_by_borrowed(true);
+
+    expect(borrowed_matches.size() == 1 &&
+        borrowed_matches.front().id == 2,
+        "borrowed search should find borrowed books");
+
+    const auto available_matches =
+        service.search_by_borrowed(false);
+
+    expect(available_matches.size() == 2,
+        "borrowed search should find available books");
+
     const auto combined_matches =
         service.search_by_author_and_year("LIPPMAN", 2012);
 
