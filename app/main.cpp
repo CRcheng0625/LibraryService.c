@@ -10,6 +10,9 @@ namespace {
 
     bool read_int(int& value) {
         if (std::cin >> value) {
+            std::cin.ignore(
+                std::numeric_limits<std::streamsize>::max(),
+                '\n');
             return true;
         }
 
@@ -23,7 +26,7 @@ namespace {
 		std::cout << prompt;
 
 		std::string line;
-		std::getline(std::cin >> std::ws, line);
+		std::getline(std::cin, line);
 		return line;
     }
 
@@ -73,8 +76,16 @@ namespace {
         }
 
 		book.title = read_line("Title: ");
+        if (book.title.empty()) {
+            std::cout << "Title cannot be empty.\n";
+            return;
+        }
 
 		book.author = read_line("Author: ");
+        if (book.author.empty()) {
+            std::cout << "Author cannot be empty.\n";
+            return;
+        }
         std::cout << "Publication year: ";
 
         if (!read_int(book.publication_year)) {
