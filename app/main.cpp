@@ -1,4 +1,5 @@
 #include "library/library_service.hpp"
+#include "library/book_storage.hpp"
 
 #include <iostream>
 #include <limits>
@@ -228,8 +229,13 @@ namespace {
 }  // namespace
 
 int main() {
+    const std::string file_path = "books.txt";
     library::LibraryService service;
-    service.add_book({1, "The C++ Programming Language", "Bjarne Stroustrup", 2013, false});
+
+    const auto loaded_books = library::load_books_from_file(file_path);
+    for (const auto& book : loaded_books) {
+        service.add_book(book);
+    }
 
     while (true) {
         print_menu();
@@ -240,6 +246,10 @@ int main() {
 
         switch (choice) {
         case 0:
+            if (!library::save_books_to_file(service.all_books(), file_path)) {
+                std::cerr << "Failed to save books.\n";
+                return 1;
+            }
             return 0;
         case 1:
             list_books(service);
