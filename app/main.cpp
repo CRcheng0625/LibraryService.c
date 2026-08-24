@@ -31,6 +31,7 @@ namespace {
             << "9. List available books\n"
             << "10. Search by author\n"
 			<< "11. Search by year\n"
+            << "12. Search by author and year\n"
             << "0. Exit\n"
             << "Choose: ";
     }
@@ -272,6 +273,9 @@ int main() {
             break;
         case 11:
             search_books_by_year(service);
+            break;
+        case 12:
+            search_by_author_and_year(service);
             break;
         default:
             std::cout << "Unknown choice.\n";
