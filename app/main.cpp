@@ -19,6 +19,14 @@ namespace {
         return false;
     }
 
+    std::string read_line(const std::string& prompt) {
+		std::cout << prompt;
+
+		std::string line;
+		std::getline(std::cin >> std::ws, line);
+		return line;
+    }
+
     void print_menu() {
         std::cout << "\nLibrary manager\n"
             << "1. List books\n"
@@ -63,13 +71,12 @@ namespace {
         if (!read_int(book.id)) {
             return;
         }
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        std::cout << "Title: ";
-        std::getline(std::cin, book.title);
-        std::cout << "Author: ";
-        std::getline(std::cin, book.author);
+		book.title = read_line("Title: ");
+
+		book.author = read_line("Author: ");
         std::cout << "Publication year: ";
+
         if (!read_int(book.publication_year)) {
             return;
         }
@@ -104,11 +111,7 @@ namespace {
     }
 
     void search_books_by_title(const library::LibraryService& service) {
-        std::string keyword;
-        std::cout << "Title keyword: ";
-
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::getline(std::cin, keyword);
+		std::string keyword = read_line("Title keyword: ");
 
         const auto matches = service.search_by_title(keyword);
 
@@ -164,13 +167,7 @@ namespace {
 
     void search_books_by_author(
         const library::LibraryService& service) {
-        std::string keyword;
-        std::cout << "Author keyword: ";
-
-        std::cin.ignore(
-            std::numeric_limits<std::streamsize>::max(),
-            '\n');
-        std::getline(std::cin, keyword);
+        std::string keyword = read_line("Author keyword: ");
 
         const auto matches = service.search_by_author(keyword);
 
@@ -204,13 +201,7 @@ namespace {
     
     void search_by_author_and_year(
         const library::LibraryService& service) {
-		std::string keyword;
-        std::cout << "Author keyword: ";
-
-        std::cin.ignore(
-            std::numeric_limits<std::streamsize>::max(),
-            '\n');
-        std::getline(std::cin, keyword);
+		std::string keyword = read_line("Author keyword: ");
 
         int year{};
         std::cout << "Publication year: ";
