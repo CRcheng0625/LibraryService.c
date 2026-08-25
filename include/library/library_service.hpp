@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 namespace library {
@@ -27,7 +28,10 @@ public:
     [[nodiscard]] const std::vector<Book>& all_books() const noexcept;
 
 private:
+    void rebuild_index();
+
     std::vector<Book> books_;
+    std::unordered_map<int, std::size_t> id_index_; // id / books_[index]
 };
 
 }  // namespace library

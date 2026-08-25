@@ -5,6 +5,7 @@
 #include <iterator>
 #include <string>
 #include <utility>
+#include <unordered_map>
 
 namespace library {
 namespace {
@@ -19,12 +20,21 @@ std::string to_lower(std::string_view text) {
 
 }  // namespace
 
+void LibraryService::rebuild_index() {
+    id_index_.clear();
+
+    for (std::size_t index = 0; index < books_.size(); ++index) {
+        id_index_[books_[index].id] = index;
+    }
+}
+
 bool LibraryService::add_book(Book book) {
     if (book.id <= 0 || book.title.empty() || find_by_id(book.id).has_value()) {
         return false;
     }
 
     books_.push_back(std::move(book));
+    rebuild_index();
     return true;
 }
 
@@ -35,7 +45,11 @@ bool LibraryService::remove_book(int id) {
             return book.id == id;
         }),
         books_.end());
-    return books_.size() != old_size;
+    const bool removed = books_.size() != old_size;
+    if (removed) {
+        rebuild_index();
+    }
+    return removed;
 }
 
 bool LibraryService::borrow_book(int id) {
@@ -63,13 +77,16 @@ bool LibraryService::return_book(int id) {
 }
 
 std::optional<Book> LibraryService::find_by_id(int id) const {
-    const auto it = std::find_if(books_.begin(), books_.end(), [id](const Book& book) {
-        return book.id == id;
-    });
-    if (it == books_.end()) {
+    const auto index_it = id_index_.find(id);
+    if (index_it == id_index_.end()) {
         return std::nullopt;
     }
-    return *it;
+
+    if (index_it->second >= books_.size()) {
+        return std::nullopt;
+    }
+
+    return books_[index_it->second];
 }
 
 std::vector<Book> LibraryService::search_by_title(std::string_view keyword) const {
