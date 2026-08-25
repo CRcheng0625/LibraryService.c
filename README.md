@@ -12,6 +12,7 @@
 - 按作者与出版年份组合查询
 - 启动时从 `books.txt` 读取数据，退出时保存数据
 - 使用 CTest 运行自动化测试
+- 使用 `.clang-format` 统一 C++ 代码风格
 
 ## 项目结构
 
@@ -65,6 +66,8 @@ cmake --preset default
 cmake --build --preset default
 ctest --preset default --output-on-failure
 ```
+
+项目根目录的 `.clang-format` 定义了统一格式。Visual Studio 安装 clang-format 后，可以对当前文件执行格式化；格式化属于代码风格调整，不改变业务逻辑。
 
 运行命令行程序：
 
