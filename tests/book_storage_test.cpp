@@ -2,10 +2,10 @@
 #include "library/library_service.hpp"
 
 #include <cstdio>
+#include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <string>
-#include <vector>
-#include <fstream>
 #include <string_view>
 
 namespace {
@@ -39,12 +39,23 @@ void test_save_and_load_books() {
 
     const std::string file_path = "test_books.txt";
 
-    expect(library::save_books_to_file(service.all_books(), file_path),
-           "saving books should succeed");
+    const bool save_success =
+        library::save_books_to_file(service.all_books(), file_path);
+
+    expect(save_success, "saving books should succeed");
+
+    if (!save_success) {
+        std::remove(file_path.c_str());
+        return;
+    }
 
     const auto loaded_books = library::load_books_from_file(file_path);
 
-    expect(loaded_books.size() == 2, "loading should restore two books");
+    if (loaded_books.size() != 2) {
+        expect(false, "loading should restore two books");
+        std::remove(file_path.c_str());
+        return;
+    }
 
     expect(loaded_books[0].title == "C++ Primer" && loaded_books[1].borrowed,
            "loading should restore book data");
@@ -76,44 +87,16 @@ void test_load_invalid_file() {
 } //namespace
 
 int main() {
-    const std::string file_path = "storage_test_books.txt";
-
-    const std::vector<library::Book> books{
-        {1, "C++ Primer", "Stanley Lippman", 2012, false}
-    };
-
-    if (!library::save_books_to_file(books, file_path)) {
-        std::cerr << "Saving books failed.\n";
-        failures++;
-    }
-
-    const auto loaded = library::load_books_from_file(file_path);
-
-    std::remove(file_path.c_str());
-
-    if (loaded.size() != 1 || loaded.front().title != "C++ Primer") {
-        std::cerr << "Loaded data is incorrect.\n";
-        failures++;
-    }
-    
-
-    const auto missing = library::load_books_from_file("missing_storage_test_file.txt");
-
-    if (!missing.empty()) {
-        std::cerr << "A missing file should produce no books.\n";
-        failures++;
-    }
-
     test_save_books();
     test_save_and_load_books();
     test_load_missing_file();
     test_load_invalid_file();
 
     if (failures == 0) {
-        std::cout << "All tests passed.\n";
+        std::cout << "All storage tests passed.\n";
         return EXIT_SUCCESS;
     }
 
-    std::cerr << failures << " test(s) failed.\n";
+    std::cerr << failures << " storage test(s) failed.\n";
     return EXIT_FAILURE;
 }
