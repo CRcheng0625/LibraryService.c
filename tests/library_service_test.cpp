@@ -236,6 +236,24 @@ void test_load_invalid_file() {
     std::remove(file_path.c_str());
 }
 
+void test_index_after_middle_removal() {
+    library::LibraryService service;
+    service.add_book({1, "First", "Author A", 2020, false});
+    service.add_book({2, "Second", "Author B", 2021, false});
+    service.add_book({3, "Third", "Author C", 2022, false});
+
+    expect(service.remove_book(2), "the middle book should be removed");
+
+    const auto first = service.find_by_id(1);
+    const auto third = service.find_by_id(3);
+    const auto removed = service.find_by_id(2);
+
+    expect(first && first->title == "First", "the first book should remain searchable");
+    expect(third && third->title == "Third", 
+        "the book after the removed item should remain searchable");
+    expect(!removed, "the removed book should not be found");
+}
+
 }  // namespace
 
 int main() {
@@ -250,6 +268,7 @@ int main() {
     test_save_and_load_books();
     test_load_missing_file();
     test_load_invalid_file();
+    test_index_after_middle_removal();
 
     if (failures == 0) {
         std::cout << "All tests passed.\n";
