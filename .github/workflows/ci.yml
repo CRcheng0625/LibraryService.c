@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install build tools
-        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build g++
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build g++ clang-tidy
 
       - name: Configure
         run: cmake --preset default
@@ -25,3 +25,6 @@ jobs:
 
       - name: Test
         run: ctest --preset default
+
+      - name: Static analysis
+        run: clang-tidy src/library_service.cpp src/book_storage.cpp app/main.cpp -p=build

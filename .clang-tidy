@@ -1,0 +1,4 @@
+Checks: '-*,bugprone-*,performance-*,readability-*,-readability-identifier-length'
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*(include|src|app|tests)/.*'
+FormatStyle: file
