@@ -34,5 +34,9 @@ if(BUILD_TESTING)
     add_executable(library_tests tests/library_service_test.cpp)
     target_link_libraries(library_tests PRIVATE library_core)
     add_test(NAME library_service_tests COMMAND library_tests)
+
+    add_executable(book_storage_tests tests/book_storage_test.cpp)
+    target_link_libraries(book_storage_tests PRIVATE library_core)
+    add_test(NAME book_storage_tests COMMAND book_storage_tests)
 endif()
 
