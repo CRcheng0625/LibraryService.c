@@ -25,6 +25,9 @@ endif()
 add_executable(library_cli app/main.cpp)
 target_link_libraries(library_cli PRIVATE library_core)
 
+add_executable(lookup_benchmark tools/lookup_benchmark.cpp)
+target_link_libraries(lookup_benchmark PRIVATE library_core)
+
 include(CTest)
 
 if(BUILD_TESTING)
