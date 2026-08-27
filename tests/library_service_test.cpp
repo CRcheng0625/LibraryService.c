@@ -127,8 +127,11 @@ void test_available_books() {
 
     expect(books.size() == 1,
         "only available books should be returned");
-    expect(books.front().id == 1,
-        "the available book should be returned");
+
+    if (books.size() == 1) {
+        expect(books.front().id == 1,
+            "the available book should be returned");
+    }
 }
 
 void test_borrow_missing_book() {
