@@ -203,6 +203,16 @@ void test_search_by_author_and_borrowed() {
            "the available Meyers book should have id 2");
 }
 
+void test_search_by_author_and_borrowed_no_match() {
+    library::LibraryService service;
+    service.add_book({1, "Effective Modern C++", "Scott Meyers", 2014, true});
+    service.add_book({3, "Clean Code", "Robert Martin", 2008, true});
+
+    const auto matches = service.search_by_author_and_borrowed("Martin", false);
+
+    expect(matches.empty(), "a borrowed book should not match an available search");
+}
+
 }  // namespace
 
 int main() {
@@ -215,6 +225,7 @@ int main() {
     test_find_missing_book();
     test_index_after_middle_removal();
     test_search_by_author_and_borrowed();
+    test_search_by_author_and_borrowed_no_match();
 
     if (failures == 0) {
         std::cout << "All tests passed.\n";
