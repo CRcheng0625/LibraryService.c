@@ -194,6 +194,8 @@ void test_search_by_author_and_borrowed() {
 
     const auto borrowed_matches = service.search_by_author_and_borrowed("meyers", true);
 
+    expect(service.all_books().size() == 3, "search should not change the number of books");
+
     expect(borrowed_matches.size() == 1 && borrowed_matches.front().id == 1,
            "the borrowed Meyers book should have id 1");
 
