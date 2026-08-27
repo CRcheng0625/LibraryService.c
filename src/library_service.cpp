@@ -170,4 +170,18 @@ std::vector<Book> LibraryService::search_by_borrowed(bool borrowed) const {
     return matches;
 }
 
+std::vector<Book> LibraryService::search_by_author_and_borrowed(
+    std::string_view author,
+    bool borrowed) const {
+    const std::string normalized_author = to_lower(author);
+    std::vector<Book> matches;
+    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
+        [&normalized_author, borrowed](const Book& book) {
+            return to_lower(book.author).find(normalized_author) != std::string::npos &&
+                   book.borrowed == borrowed;
+        }
+    );
+    return matches;
+}
+
 }  // namespace library

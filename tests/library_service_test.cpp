@@ -186,6 +186,23 @@ void test_index_after_middle_removal() {
     expect(!removed, "the removed book should not be found");
 }
 
+void test_search_by_author_and_borrowed() {
+    library::LibraryService service;
+    service.add_book({1, "Effective Modern C++", "Scott Meyers", 2014, true});
+    service.add_book({2, "More Effective C++", "Scott Meyers", 1995, false});
+    service.add_book({3, "Clean Code", "Robert Martin", 2008, true});
+
+    const auto borrowed_matches = service.search_by_author_and_borrowed("meyers", true);
+
+    expect(borrowed_matches.size() == 1 && borrowed_matches.front().id == 1,
+           "the borrowed Meyers book should have id 1");
+
+    const auto available_matches = service.search_by_author_and_borrowed("MEYERS", false);
+
+    expect(available_matches.size() == 1 && available_matches.front().id == 2,
+           "the available Meyers book should have id 2");
+}
+
 }  // namespace
 
 int main() {
@@ -197,6 +214,7 @@ int main() {
     test_borrow_missing_book();
     test_find_missing_book();
     test_index_after_middle_removal();
+    test_search_by_author_and_borrowed();
 
     if (failures == 0) {
         std::cout << "All tests passed.\n";

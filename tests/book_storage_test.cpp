@@ -84,6 +84,30 @@ void test_load_invalid_file() {
     std::remove(file_path.c_str());
 }
 
+void test_load_empty_file() {
+    const std::string file_path = "empty_books.txt";
+
+    {
+        std::ofstream output(file_path);
+        const bool file_created = output.is_open();
+
+        expect(file_created, "creating an empty file should succeed");
+
+        if (!file_created) {
+            std::remove(file_path.c_str());
+            return;
+        }
+    }
+
+    const auto books = library::load_books_from_file(file_path);
+
+    expect(books.empty(), "an empty file should return no books");
+
+    const int remove_result = std::remove(file_path.c_str());
+
+    expect(remove_result == 0, "temporary file should be removed");
+}
+
 } //namespace
 
 int main() {
@@ -91,6 +115,7 @@ int main() {
     test_save_and_load_books();
     test_load_missing_file();
     test_load_invalid_file();
+    test_load_empty_file();
 
     if (failures == 0) {
         std::cout << "All storage tests passed.\n";

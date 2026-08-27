@@ -45,6 +45,7 @@ namespace {
 			<< "11. Search by year\n"
             << "12. Search by author and year\n"
 			<< "13. Search by borrowed\n"
+            << "14. Search by author and borrowed status\n"
             << "0. Exit\n"
             << "Choose: ";
     }
@@ -246,6 +247,29 @@ namespace {
             print_book(book);
         }
     }
+
+    void search_by_author_and_borrowed(
+        const library::LibraryService& service) {
+        std::string keyword = read_line("Author keyword: ");
+
+        int choice{};
+        std::cout << "Enter 1 for borrowed, 0 for available: ";
+
+        if (!read_int(choice) || (choice != 0 && choice != 1)) {
+            std::cout << "Please enter 1 or 0.\n";
+            return;
+        }
+
+        const bool borrowed = choice == 1;
+        const auto matches =
+            service.search_by_author_and_borrowed(keyword, borrowed);
+        std::cout << "Matches: " << matches.size() << "\n";
+
+        for (const auto& book : matches) {
+            print_book(book);
+        }
+    }
+
 }  // namespace
 
 int main() {
@@ -309,6 +333,9 @@ int main() {
             break;
         case 13:
             search_by_borrowed(service);
+            break;
+        case 14:
+            search_by_author_and_borrowed(service);
             break;
         default:
             std::cout << "Unknown choice.\n";
