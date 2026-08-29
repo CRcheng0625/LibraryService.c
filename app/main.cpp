@@ -8,12 +8,34 @@
 
 namespace {
 
+    enum class MenuChoice : unsigned char {
+        exit = 0,
+        list_books = 1,
+        add_book = 2,
+        borrow_book = 3,
+        return_book = 4,
+        remove_book = 5,
+        search_title = 6,
+        find_by_id = 7,
+        list_by_year = 8,
+        list_available = 9,
+        search_author = 10,
+        search_year = 11,
+        search_author_and_year = 12,
+        search_borrowed = 13,
+        search_author_and_borrowed = 14
+    };
+
     bool read_int(int& value) {
         if (std::cin >> value) {
             std::cin.ignore(
                 std::numeric_limits<std::streamsize>::max(),
                 '\n');
             return true;
+        }
+
+        if (std::cin.eof()) {
+            return false;
         }
 
         std::cin.clear();
@@ -196,10 +218,6 @@ namespace {
 		int year{};
 		std::cout << "Publication year: ";
 
-        std::cin.ignore(
-            std::numeric_limits<std::streamsize>::max(),
-            '\n');
-
         if (!read_int(year)) {
 			return;
         }
@@ -270,71 +288,87 @@ namespace {
         }
     }
 
-}  // namespace
+    bool save_library(const library::LibraryService& service, const std::string& file_path) {
+        if (library::save_books_to_file(service.all_books(), file_path)) {
+            return true;
+        }
+
+        std::cerr << "Failed to save books.\n";
+        return false;
+    }
+
+    }  // namespace
 
 int main() {
     const std::string file_path = "books.txt";
     library::LibraryService service;
 
-    const auto loaded_books = library::load_books_from_file(file_path);
-    for (const auto& book : loaded_books) {
-        service.add_book(book);
+    const auto load_result = library::load_books_from_file(file_path);
+
+    if (load_result.status == library::LoadStatus::success ||
+        load_result.status == library::LoadStatus::file_not_found) {
+        for (const auto& book : load_result.books) {
+            service.add_book(book);
+        }
+    } else {
+        std::cerr << "Failed to load books: file is unavailable or invalid.\n";
+        return 1;
     }
 
     while (true) {
         print_menu();
         int choice{};
         if (!read_int(choice)) {
+            if (std::cin.eof()) {
+                return save_library(service, file_path) ? 0 : 1;
+            }
+
             continue;
         }
 
-        switch (choice) {
-        case 0:
-            if (!library::save_books_to_file(service.all_books(), file_path)) {
-                std::cerr << "Failed to save books.\n";
-                return 1;
-            }
-            return 0;
-        case 1:
+        switch (static_cast<MenuChoice>(choice)) {
+        case MenuChoice::exit:
+            return save_library(service, file_path) ? 0 : 1;
+        case MenuChoice::list_books:
             list_books(service);
             break;
-        case 2:
+        case MenuChoice::add_book:
             add_book(service);
             break;
-        case 3:
+        case MenuChoice::borrow_book:
             update_borrow_status(service, true);
             break;
-        case 4:
+        case MenuChoice::return_book:
             update_borrow_status(service, false);
             break;
-        case 5:
+        case MenuChoice::remove_book:
             remove_book_from_library(service);
             break;
-        case 6:
+        case MenuChoice::search_title:
             search_books_by_title(service);
             break;
-        case 7:
+        case MenuChoice::find_by_id:
             find_book_by_id(service);
             break;
-        case 8:
+        case MenuChoice::list_by_year:
             list_books_by_year(service);
             break;
-        case 9:
+        case MenuChoice::list_available:
             list_available_books(service);
             break;
-        case 10:
+        case MenuChoice::search_author:
             search_books_by_author(service);
             break;
-        case 11:
+        case MenuChoice::search_year:
             search_books_by_year(service);
             break;
-        case 12:
+        case MenuChoice::search_author_and_year:
             search_by_author_and_year(service);
             break;
-        case 13:
+        case MenuChoice::search_borrowed:
             search_by_borrowed(service);
             break;
-        case 14:
+        case MenuChoice::search_author_and_borrowed:
             search_by_author_and_borrowed(service);
             break;
         default:

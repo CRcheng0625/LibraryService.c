@@ -187,6 +187,10 @@ void test_index_after_middle_removal() {
     expect(third && third->title == "Third", 
         "the book after the removed item should remain searchable");
     expect(!removed, "the removed book should not be found");
+    expect(service.borrow_book(3),
+        "the rebuilt index should allow borrowing a shifted book");
+    expect(service.return_book(3),
+        "the rebuilt index should allow returning a shifted book");
 }
 
 void test_search_by_author_and_borrowed() {

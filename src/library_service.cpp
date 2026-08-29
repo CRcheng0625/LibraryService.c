@@ -29,12 +29,12 @@ void LibraryService::rebuild_index() {
 }
 
 bool LibraryService::add_book(Book book) {
-    if (book.id <= 0 || book.title.empty() || find_by_id(book.id).has_value()) {
+    if (book.id <= 0 || book.title.empty() || id_index_.find(book.id) != id_index_.end()) {
         return false;
     }
 
     books_.push_back(std::move(book));
-    rebuild_index();
+    id_index_[books_.back().id] = books_.size() - 1;
     return true;
 }
 
@@ -53,26 +53,32 @@ bool LibraryService::remove_book(int id) {
 }
 
 bool LibraryService::borrow_book(int id) {
-    auto it = std::find_if(books_.begin(), books_.end(), [id](const Book& book) {
-        return book.id == id;
-    });
-    if (it == books_.end() || it->borrowed) {
+    const auto index_it = id_index_.find(id);
+    if (index_it == id_index_.end() || index_it->second >= books_.size()) {
         return false;
     }
 
-    it->borrowed = true;
+    Book& book = books_[index_it->second];
+    if (book.borrowed) {
+        return false;
+    }
+
+    book.borrowed = true;
     return true;
 }
 
 bool LibraryService::return_book(int id) {
-    auto it = std::find_if(books_.begin(), books_.end(), [id](const Book& book) {
-        return book.id == id;
-    });
-    if (it == books_.end() || !it->borrowed) {
+    const auto index_it = id_index_.find(id);
+    if (index_it == id_index_.end() || index_it->second >= books_.size()) {
         return false;
     }
 
-    it->borrowed = false;
+    Book& book = books_[index_it->second];
+    if (!book.borrowed) {
+        return false;
+    }
+
+    book.borrowed = false;
     return true;
 }
 

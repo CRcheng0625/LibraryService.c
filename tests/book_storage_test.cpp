@@ -49,24 +49,32 @@ void test_save_and_load_books() {
         return;
     }
 
-    const auto loaded_books = library::load_books_from_file(file_path);
+    const auto load_result = library::load_books_from_file(file_path);
 
-    if (loaded_books.size() != 2) {
+    expect(load_result.status == library::LoadStatus::success,
+           "loading should report success");
+
+    if (load_result.books.size() != 2) {
         expect(false, "loading should restore two books");
         std::remove(file_path.c_str());
         return;
     }
 
-    expect(loaded_books[0].title == "C++ Primer" && loaded_books[1].borrowed,
+    expect(load_result.books[0].title == "C++ Primer" &&
+               load_result.books[1].borrowed,
            "loading should restore book data");
 
     std::remove(file_path.c_str());
 }
 
 void test_load_missing_file() {
-    const auto books = library::load_books_from_file("file_that_does_not_exist.txt");
+    const auto result =
+        library::load_books_from_file("file_that_does_not_exist.txt");
 
-    expect(books.empty(), "loading a missing file should return an empty vector");
+    expect(result.status == library::LoadStatus::file_not_found,
+           "loading a missing file should report file_not_found");
+    expect(result.books.empty(),
+           "loading a missing file should return no books");
 }
 
 void test_load_invalid_file() {
@@ -77,9 +85,11 @@ void test_load_invalid_file() {
         output << "this is not a valid book record\n";
     }
 
-    const auto books = library::load_books_from_file(file_path);
+    const auto result = library::load_books_from_file(file_path);
 
-    expect(books.empty(), "an invalid file should return an empty vector");
+    expect(result.status == library::LoadStatus::invalid_format,
+           "an invalid file should report invalid_format");
+    expect(result.books.empty(), "an invalid file should return no books");
 
     std::remove(file_path.c_str());
 }
@@ -99,9 +109,11 @@ void test_load_empty_file() {
         }
     }
 
-    const auto books = library::load_books_from_file(file_path);
+    const auto result = library::load_books_from_file(file_path);
 
-    expect(books.empty(), "an empty file should return no books");
+    expect(result.status == library::LoadStatus::success,
+           "an empty file should report success");
+    expect(result.books.empty(), "an empty file should return no books");
 
     const int remove_result = std::remove(file_path.c_str());
 

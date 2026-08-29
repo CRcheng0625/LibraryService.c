@@ -3,10 +3,11 @@
 #include <algorithm>
 #include <chrono>
 #include <iostream>
+#include <optional>
 
 namespace {
 
-const library::Book* linear_find_by_id(
+std::optional<library::Book> linear_find_by_id(
     const std::vector<library::Book>& books,
     int id) {
     const auto it = std::find_if(
@@ -15,7 +16,11 @@ const library::Book* linear_find_by_id(
             return book.id == id;
         });
 
-    return it == books.end() ? nullptr : &*it;
+    if (it == books.end()) {
+        return std::nullopt;
+    }
+
+    return *it;
 }
 
 }  // namespace
@@ -33,8 +38,7 @@ int main() {
     std::size_t linear_hits = 0;
     const auto linear_start = std::chrono::steady_clock::now();
     for (int repetition = 0; repetition < repetitions; ++repetition) {
-        linear_hits +=
-            linear_find_by_id(service.all_books(), book_count) != nullptr;
+        linear_hits += linear_find_by_id(service.all_books(), book_count).has_value();
     }
     const auto linear_end = std::chrono::steady_clock::now();
 

@@ -2,7 +2,8 @@
 
 #include <fstream>
 #include <iomanip>
-#include <vector>
+#include <filesystem>
+#include <utility>
 
 namespace library {
 
@@ -27,13 +28,17 @@ namespace library {
         return static_cast<bool>(output);
     }
 
-    std::vector<Book> load_books_from_file(
+    LoadResult load_books_from_file(
         const std::string& file_path) {
 
         std::ifstream input(file_path);
 
         if (!input) {
-            return {};
+            if (std::filesystem::exists(file_path)) {
+                return {{}, LoadStatus::open_error};
+            }
+
+            return {{}, LoadStatus::file_not_found};
         }
 
         std::vector<Book> books;
@@ -48,10 +53,10 @@ namespace library {
         }
 
         if (!input.eof()) {
-            return {};
+            return {{}, LoadStatus::invalid_format};
         }
 
-        return books;
+        return {std::move(books), LoadStatus::success};
     }
 
 }  // namespace library
