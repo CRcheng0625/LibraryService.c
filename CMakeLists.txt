@@ -55,5 +55,9 @@ if(BUILD_TESTING)
     add_executable(book_storage_tests tests/book_storage_test.cpp)
     target_link_libraries(book_storage_tests PRIVATE library_core)
     add_test(NAME book_storage_tests COMMAND book_storage_tests)
+
+    add_executable(book_storage_gtest tests/book_storage_gtest.cpp)
+    target_link_libraries(book_storage_gtest PRIVATE library_core GTest::gtest_main)
+    gtest_discover_tests(book_storage_gtest)
 endif()
 
