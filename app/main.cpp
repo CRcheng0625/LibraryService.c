@@ -303,6 +303,31 @@ namespace {
         return false;
     }
 
+    bool load_library(
+        library::LibraryService& service,
+        const std::string& file_path) {
+        const auto result = library::load_books_from_file(file_path);
+
+        switch (result.status) {
+        case library::LoadStatus::success:
+            for (const auto& book : result.books) {
+                service.add_book(book);
+            }
+            return true;
+        case library::LoadStatus::file_not_found:
+            return true;
+        case library::LoadStatus::open_error:
+            std::cerr << "Failed to open books file.\n";
+            return false;
+        case library::LoadStatus::invalid_format:
+            std::cerr << "Books file has invalid format.\n";
+            return false;
+        default:
+            std::cerr << "Unknown books loading error.\n";
+            return false;
+        }
+    }
+
     MenuAction handle_menu_choice(
         int choice,
         library::LibraryService& service,
@@ -368,15 +393,7 @@ int main() {
     const std::string file_path = "books.txt";
     library::LibraryService service;
 
-    const auto load_result = library::load_books_from_file(file_path);
-
-    if (load_result.status == library::LoadStatus::success ||
-        load_result.status == library::LoadStatus::file_not_found) {
-        for (const auto& book : load_result.books) {
-            service.add_book(book);
-        }
-    } else {
-        std::cerr << "Failed to load books: file is unavailable or invalid.\n";
+    if (!load_library(service, file_path)) {
         return 1;
     }
 
