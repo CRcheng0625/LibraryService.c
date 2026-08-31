@@ -24,7 +24,8 @@ enum class MenuChoice : unsigned char {
     search_author_and_year = 12,
     search_borrowed = 13,
     search_author_and_borrowed = 14,
-    update_book = 15
+    update_book = 15,
+    list_by_title = 16
 };
 
 enum class MenuAction : unsigned char {
@@ -74,6 +75,7 @@ void print_menu() {
               << "13. Search by borrowed\n"
               << "14. Search by author and borrowed status\n"
               << "15. Update book\n"
+              << "16. List books by title\n"
               << "0. Exit\n"
               << "Choose: ";
 }
@@ -208,6 +210,19 @@ void find_book_by_id(const library::LibraryService& service) {
 
 void list_books_by_year(const library::LibraryService& service) {
     const auto books = service.books_sorted_by_year();
+
+    if (books.empty()) {
+        std::cout << "No books yet.\n";
+        return;
+    }
+
+    for (const auto& book : books) {
+        print_book(book);
+    }
+}
+
+void list_books_by_title(const library::LibraryService& service) {
+    const auto books = service.books_sorted_by_title();
 
     if (books.empty()) {
         std::cout << "No books yet.\n";
@@ -398,6 +413,9 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
         break;
     case MenuChoice::update_book:
         update_book_in_library(service);
+        break;
+    case MenuChoice::list_by_title:
+        list_books_by_title(service);
         break;
     default:
         std::cout << "Unknown choice.\n";

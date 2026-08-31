@@ -113,6 +113,39 @@ TEST(LibraryServiceTest, ReturnsNoResultsForUnknownSearch) {
     EXPECT_TRUE(service.search_by_year(1990).empty());
 }
 
+TEST(LibraryServiceTest, SortsBooksByTitleAndId) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({3, "C++", "Author C", 2022, false}));
+    ASSERT_TRUE(service.add_book({2, "Algorithms", "Author B", 2021, false}));
+    ASSERT_TRUE(service.add_book({1, "C++", "Author A", 2020, false}));
+
+    const auto sorted = service.books_sorted_by_title();
+
+    ASSERT_EQ(sorted.size(), 3U);
+    EXPECT_EQ(sorted[0].title, "Algorithms");
+    EXPECT_EQ(sorted[1].id, 1);
+    EXPECT_EQ(sorted[2].id, 3);
+}
+
+TEST(LibraryServiceTest, TitleSortingDoesNotChangeOriginalOrder) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({3, "C++", "Author C", 2022, false}));
+    ASSERT_TRUE(service.add_book({2, "Algorithms", "Author B", 2021, false}));
+
+    const auto sorted = service.books_sorted_by_title();
+
+    ASSERT_EQ(sorted.size(), 2U);
+    ASSERT_EQ(service.all_books().size(), 2U);
+    EXPECT_EQ(service.all_books()[0].id, 3);
+    EXPECT_EQ(service.all_books()[1].id, 2);
+}
+
+TEST(LibraryServiceTest, SortingEmptyLibraryReturnsEmptyVector) {
+    library::LibraryService service;
+
+    EXPECT_TRUE(service.books_sorted_by_title().empty());
+}
+
 TEST(LibraryServiceTest, RebuildsIndexAfterMiddleRemoval) {
     library::LibraryService service;
     ASSERT_TRUE(service.add_book({1, "First", "Author A", 2020, false}));

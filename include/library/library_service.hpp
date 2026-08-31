@@ -27,7 +27,7 @@ class LibraryService {
     [[nodiscard]] std::vector<Book> search_by_borrowed(bool borrowed) const;
     [[nodiscard]] std::vector<Book> search_by_author_and_borrowed(std::string_view author,
                                                                   bool borrowed) const;
-
+    [[nodiscard]] std::vector<Book> books_sorted_by_title() const;
     [[nodiscard]] std::vector<Book> books_sorted_by_year() const;
     [[nodiscard]] std::vector<Book> available_books() const;
     [[nodiscard]] const std::vector<Book>& all_books() const noexcept;

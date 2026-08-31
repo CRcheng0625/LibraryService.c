@@ -151,6 +151,14 @@ std::vector<Book> LibraryService::books_sorted_by_year() const {
     return result;
 }
 
+std::vector<Book> LibraryService::books_sorted_by_title() const {
+    std::vector<Book> result = books_;
+    std::sort(result.begin(), result.end(), [](const Book& left, const Book& right) {
+        return left.title != right.title ? left.title < right.title : left.id < right.id;
+    });
+    return result;
+}
+
 const std::vector<Book>& LibraryService::all_books() const noexcept {
     return books_;
 }
