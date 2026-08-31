@@ -4,21 +4,20 @@
 #include <cctype>
 #include <iterator>
 #include <string>
-#include <utility>
 #include <unordered_map>
+#include <utility>
 
 namespace library {
 namespace {
 
 std::string to_lower(std::string_view text) {
     std::string result(text);
-    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char ch) {
-        return static_cast<char>(std::tolower(ch));
-    });
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
     return result;
 }
 
-}  // namespace
+} // namespace
 
 void LibraryService::rebuild_index() {
     id_index_.clear();
@@ -40,11 +39,9 @@ bool LibraryService::add_book(Book book) {
 
 bool LibraryService::remove_book(int id) {
     const auto old_size = books_.size();
-    books_.erase(
-        std::remove_if(books_.begin(), books_.end(), [id](const Book& book) {
-            return book.id == id;
-        }),
-        books_.end());
+    books_.erase(std::remove_if(books_.begin(), books_.end(),
+                                [id](const Book& book) { return book.id == id; }),
+                 books_.end());
     const bool removed = books_.size() != old_size;
     if (removed) {
         rebuild_index();
@@ -106,29 +103,23 @@ std::vector<Book> LibraryService::search_by_title(std::string_view keyword) cons
     return matches;
 }
 
-std::vector<Book> LibraryService::search_by_author(
-    std::string_view keyword) const {
+std::vector<Book> LibraryService::search_by_author(std::string_view keyword) const {
     const std::string normalized_keyword = to_lower(keyword);
     std::vector<Book> matches;
 
-    std::copy_if(
-        books_.begin(),
-        books_.end(),
-        std::back_inserter(matches),
-        [&normalized_keyword](const Book& book) {
-            return to_lower(book.author).find(normalized_keyword)
-                != std::string::npos;
-        });
+    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
+                 [&normalized_keyword](const Book& book) {
+                     return to_lower(book.author).find(normalized_keyword) != std::string::npos;
+                 });
 
     return matches;
 }
 
 std::vector<Book> LibraryService::search_by_year(int year) const {
-	std::vector<Book> matches;
-	std::copy_if(
-        books_.begin(), books_.end(), std::back_inserter(matches),
-		[year](const Book& book) { return book.publication_year == year; });
-	return matches;
+    std::vector<Book> matches;
+    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
+                 [year](const Book& book) { return book.publication_year == year; });
+    return matches;
 }
 
 std::vector<Book> LibraryService::books_sorted_by_year() const {
@@ -153,41 +144,35 @@ std::vector<Book> LibraryService::available_books() const {
     return result;
 }
 
-std::vector<Book> LibraryService::search_by_author_and_year(std::string_view author, int year) const {
+std::vector<Book> LibraryService::search_by_author_and_year(std::string_view author,
+                                                            int year) const {
     const std::string normalized_author = to_lower(author);
     std::vector<Book> matches;
-    std::copy_if(
-        books_.begin(), books_.end(), std::back_inserter(matches),
-        [&normalized_author, year](const Book& book) {
-            return to_lower(book.author).find(normalized_author) != std::string::npos &&
-                   book.publication_year == year;
-        }
-    );
+    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
+                 [&normalized_author, year](const Book& book) {
+                     return to_lower(book.author).find(normalized_author) != std::string::npos &&
+                            book.publication_year == year;
+                 });
     return matches;
 }
 
 std::vector<Book> LibraryService::search_by_borrowed(bool borrowed) const {
     std::vector<Book> matches;
     std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
-        [borrowed](const Book& book) {
-            return book.borrowed == borrowed;
-        }
-    );
+                 [borrowed](const Book& book) { return book.borrowed == borrowed; });
     return matches;
 }
 
-std::vector<Book> LibraryService::search_by_author_and_borrowed(
-    std::string_view author,
-    bool borrowed) const {
+std::vector<Book> LibraryService::search_by_author_and_borrowed(std::string_view author,
+                                                                bool borrowed) const {
     const std::string normalized_author = to_lower(author);
     std::vector<Book> matches;
     std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
-        [&normalized_author, borrowed](const Book& book) {
-            return to_lower(book.author).find(normalized_author) != std::string::npos &&
-                   book.borrowed == borrowed;
-        }
-    );
+                 [&normalized_author, borrowed](const Book& book) {
+                     return to_lower(book.author).find(normalized_author) != std::string::npos &&
+                            book.borrowed == borrowed;
+                 });
     return matches;
 }
 
-}  // namespace library
+} // namespace library

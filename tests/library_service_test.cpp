@@ -21,13 +21,13 @@ void test_add_and_find_book() {
            "a valid book should be added");
 
     expect(service.all_books().size() == 1,
-        "adding one book should increase the book count to one");
+           "adding one book should increase the book count to one");
 
     expect(!service.add_book({1, "Duplicate", "Someone", 2020, false}),
            "duplicate ids should be rejected");
 
     expect(service.all_books().size() == 1,
-        "rejecting a duplicate id should not change the book count");
+           "rejecting a duplicate id should not change the book count");
 
     const auto book = service.find_by_id(1);
     expect(book.has_value(), "an existing book should be found");
@@ -49,8 +49,7 @@ void test_search_and_sort() {
     service.add_book({2, "C++ Primer", "Stanley Lippman", 2012, false});
     service.add_book({3, "Introduction to Algorithms", "Thomas Cormen", 2009, false});
 
-    expect(service.search_by_title("Python").empty(),
-           "a missing title should produce no matches");
+    expect(service.search_by_title("Python").empty(), "a missing title should produce no matches");
 
     expect(service.search_by_title("ALGORITHMS").size() == 2,
            "title search should be case insensitive");
@@ -59,46 +58,36 @@ void test_search_and_sort() {
     expect(sorted.size() == 3 && sorted.front().publication_year == 2009,
            "books should be sorted by publication year");
 
-    const auto author_matches =
-        service.search_by_author("cormen");
+    const auto author_matches = service.search_by_author("cormen");
 
-    expect(author_matches.size() == 1 &&
-        author_matches.front().id == 3,
-        "author search should find the matching book");
+    expect(author_matches.size() == 1 && author_matches.front().id == 3,
+           "author search should find the matching book");
 
     expect(service.search_by_author("LIPPMAN").size() == 1,
-        "author search should be case insensitive");
+           "author search should be case insensitive");
 
-	const auto year_matches = service.search_by_year(2012);
+    const auto year_matches = service.search_by_year(2012);
 
     expect(year_matches.size() == 1 && year_matches.front().id == 2,
-        "year search should find the matching books");
+           "year search should find the matching books");
 
     expect(service.search_by_year(1990).empty(),
-		"year search should return no matches for an unknown year");
+           "year search should return no matches for an unknown year");
 
+    expect(service.borrow_book(2), "a test book should be borrowable");
 
-    expect(service.borrow_book(2),
-           "a test book should be borrowable");
+    const auto borrowed_matches = service.search_by_borrowed(true);
 
-    const auto borrowed_matches =
-        service.search_by_borrowed(true);
+    expect(borrowed_matches.size() == 1 && borrowed_matches.front().id == 2,
+           "borrowed search should find borrowed books");
 
-    expect(borrowed_matches.size() == 1 &&
-        borrowed_matches.front().id == 2,
-        "borrowed search should find borrowed books");
+    const auto available_matches = service.search_by_borrowed(false);
 
-    const auto available_matches =
-        service.search_by_borrowed(false);
+    expect(available_matches.size() == 2, "borrowed search should find available books");
 
-    expect(available_matches.size() == 2,
-        "borrowed search should find available books");
+    const auto combined_matches = service.search_by_author_and_year("LIPPMAN", 2012);
 
-    const auto combined_matches =
-        service.search_by_author_and_year("LIPPMAN", 2012);
-
-    expect(combined_matches.size() == 1 &&
-               combined_matches.front().id == 2,
+    expect(combined_matches.size() == 1 && combined_matches.front().id == 2,
            "combined search should match author and year");
 
     expect(service.search_by_author_and_year("LIPPMAN", 1990).empty(),
@@ -109,46 +98,40 @@ void test_remove_book() {
     library::LibraryService service;
     service.add_book({10, "The Book", "Test Author", 2024, false});
 
-    expect(service.remove_book(10),
-           "an existing book should be removed");
-    expect(!service.find_by_id(10).has_value(),
-           "a removed book should no longer be found");
-    expect(!service.remove_book(99),
-           "removing a missing book should fail");
+    expect(service.remove_book(10), "an existing book should be removed");
+    expect(!service.find_by_id(10).has_value(), "a removed book should no longer be found");
+    expect(!service.remove_book(99), "removing a missing book should fail");
 }
 
 void test_available_books() {
     library::LibraryService service;
-    service.add_book({ 1,"Available","Author",2020,false });
-    service.add_book({ 2,"Borrowed","Author",2021,false });
+    service.add_book({1, "Available", "Author", 2020, false});
+    service.add_book({2, "Borrowed", "Author", 2021, false});
     service.borrow_book(2);
 
     const auto books = service.available_books();
 
-    expect(books.size() == 1,
-        "only available books should be returned");
+    expect(books.size() == 1, "only available books should be returned");
 
     if (books.size() == 1) {
-        expect(books.front().id == 1,
-            "the available book should be returned");
+        expect(books.front().id == 1, "the available book should be returned");
     }
 }
 
 void test_borrow_missing_book() {
     // Arrange
     library::LibraryService service;
-    service.add_book({ 1, "C++ Primer", "Stanley Lippman", 2012, false });
+    service.add_book({1, "C++ Primer", "Stanley Lippman", 2012, false});
 
     // Act
     const bool success = service.borrow_book(99);
 
     // Assert
-    expect(!success,
-        "borrowing a missing book should fail");
+    expect(!success, "borrowing a missing book should fail");
 
     const auto existing_book = service.find_by_id(1);
     expect(existing_book && !existing_book->borrowed,
-        "borrowing a missing id should not affect existing books");
+           "borrowing a missing id should not affect existing books");
 }
 
 void test_find_missing_book() {
@@ -157,17 +140,14 @@ void test_find_missing_book() {
 
     const auto missing_book = service.find_by_id(99);
 
-    expect(!missing_book,
-        "a missing id should return an empty optional");
+    expect(!missing_book, "a missing id should return an empty optional");
 
     const auto book = service.find_by_id(1);
 
-    expect(book.has_value(),
-           "an existing book should be found");
+    expect(book.has_value(), "an existing book should be found");
 
     if (book) {
-        expect(book->title == "C++ Primer",
-            "the found book should have the expected title");
+        expect(book->title == "C++ Primer", "the found book should have the expected title");
     }
 }
 
@@ -184,13 +164,11 @@ void test_index_after_middle_removal() {
     const auto removed = service.find_by_id(2);
 
     expect(first && first->title == "First", "the first book should remain searchable");
-    expect(third && third->title == "Third", 
-        "the book after the removed item should remain searchable");
+    expect(third && third->title == "Third",
+           "the book after the removed item should remain searchable");
     expect(!removed, "the removed book should not be found");
-    expect(service.borrow_book(3),
-        "the rebuilt index should allow borrowing a shifted book");
-    expect(service.return_book(3),
-        "the rebuilt index should allow returning a shifted book");
+    expect(service.borrow_book(3), "the rebuilt index should allow borrowing a shifted book");
+    expect(service.return_book(3), "the rebuilt index should allow returning a shifted book");
 }
 
 void test_search_by_author_and_borrowed() {
@@ -222,7 +200,7 @@ void test_search_by_author_and_borrowed_no_match() {
     expect(matches.empty(), "a borrowed book should not match an available search");
 }
 
-}  // namespace
+} // namespace
 
 int main() {
     test_add_and_find_book();

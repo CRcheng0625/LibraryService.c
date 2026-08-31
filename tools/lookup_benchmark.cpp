@@ -7,14 +7,9 @@
 
 namespace {
 
-std::optional<library::Book> linear_find_by_id(
-    const std::vector<library::Book>& books,
-    int id) {
-    const auto it = std::find_if(
-        books.begin(), books.end(),
-        [id](const library::Book& book) {
-            return book.id == id;
-        });
+std::optional<library::Book> linear_find_by_id(const std::vector<library::Book>& books, int id) {
+    const auto it = std::find_if(books.begin(), books.end(),
+                                 [id](const library::Book& book) { return book.id == id; });
 
     if (it == books.end()) {
         return std::nullopt;
@@ -23,7 +18,7 @@ std::optional<library::Book> linear_find_by_id(
     return *it;
 }
 
-}  // namespace
+} // namespace
 
 int main() {
     library::LibraryService service;
@@ -42,7 +37,6 @@ int main() {
     }
     const auto linear_end = std::chrono::steady_clock::now();
 
-
     std::size_t indexed_hits = 0;
     const auto indexed_start = std::chrono::steady_clock::now();
     for (int repetition = 0; repetition < repetitions; ++repetition) {
@@ -51,16 +45,14 @@ int main() {
     const auto indexed_end = std::chrono::steady_clock::now();
 
     const auto linear_elapsed =
-        std::chrono::duration_cast<std::chrono::microseconds>(
-            linear_end - linear_start);
+        std::chrono::duration_cast<std::chrono::microseconds>(linear_end - linear_start);
     const auto indexed_elapsed =
-        std::chrono::duration_cast<std::chrono::microseconds>(
-            indexed_end - indexed_start);
+        std::chrono::duration_cast<std::chrono::microseconds>(indexed_end - indexed_start);
 
-    std::cout << "Linear: " << linear_elapsed.count() << " microseconds, hits = "
-              << linear_hits << '\n';
-    std::cout << "Indexed: " << indexed_elapsed.count() << " microseconds, hits = "
-              << indexed_hits << '\n';
+    std::cout << "Linear: " << linear_elapsed.count() << " microseconds, hits = " << linear_hits
+              << '\n';
+    std::cout << "Indexed: " << indexed_elapsed.count() << " microseconds, hits = " << indexed_hits
+              << '\n';
 
     return 0;
 }

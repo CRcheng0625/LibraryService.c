@@ -12,5 +12,4 @@ struct Book {
     bool borrowed{};
 };
 
-}  // namespace library
-
+} // namespace library

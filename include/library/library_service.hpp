@@ -10,7 +10,7 @@
 namespace library {
 
 class LibraryService {
-public:
+  public:
     bool add_book(Book book);
     bool remove_book(int id);
     bool borrow_book(int id);
@@ -20,21 +20,21 @@ public:
     [[nodiscard]] std::vector<Book> search_by_title(std::string_view keyword) const;
     [[nodiscard]] std::vector<Book> search_by_author(std::string_view keyword) const;
     [[nodiscard]] std::vector<Book> search_by_year(int year) const;
-	[[nodiscard]] std::vector<Book> search_by_author_and_year(std::string_view author, int year) const;
-	[[nodiscard]] std::vector<Book> search_by_borrowed(bool borrowed) const;
-    [[nodiscard]] std::vector<Book> search_by_author_and_borrowed(
-        std::string_view author, bool borrowed) const;
+    [[nodiscard]] std::vector<Book> search_by_author_and_year(std::string_view author,
+                                                              int year) const;
+    [[nodiscard]] std::vector<Book> search_by_borrowed(bool borrowed) const;
+    [[nodiscard]] std::vector<Book> search_by_author_and_borrowed(std::string_view author,
+                                                                  bool borrowed) const;
 
     [[nodiscard]] std::vector<Book> books_sorted_by_year() const;
     [[nodiscard]] std::vector<Book> available_books() const;
     [[nodiscard]] const std::vector<Book>& all_books() const noexcept;
 
-private:
+  private:
     void rebuild_index();
 
     std::vector<Book> books_;
     std::unordered_map<int, std::size_t> id_index_; // id / books_[index]
 };
 
-}  // namespace library
-
+} // namespace library

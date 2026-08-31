@@ -19,11 +19,8 @@ struct LoadResult {
     LoadStatus status{LoadStatus::success};
 };
 
-bool save_books_to_file(
-    const std::vector<Book>& books,
-    const std::string& file_path);
+bool save_books_to_file(const std::vector<Book>& books, const std::string& file_path);
 
-LoadResult load_books_from_file(
-    const std::string& file_path);
+LoadResult load_books_from_file(const std::string& file_path);
 
-}  // namespace library
+} // namespace library

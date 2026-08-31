@@ -1,5 +1,5 @@
-#include "library/library_service.hpp"
 #include "library/book_storage.hpp"
+#include "library/library_service.hpp"
 
 #include <iostream>
 #include <limits>
@@ -8,386 +8,372 @@
 
 namespace {
 
-    enum class MenuChoice : unsigned char {
-        exit = 0,
-        list_books = 1,
-        add_book = 2,
-        borrow_book = 3,
-        return_book = 4,
-        remove_book = 5,
-        search_title = 6,
-        find_by_id = 7,
-        list_by_year = 8,
-        list_available = 9,
-        search_author = 10,
-        search_year = 11,
-        search_author_and_year = 12,
-        search_borrowed = 13,
-        search_author_and_borrowed = 14
-    };
+enum class MenuChoice : unsigned char {
+    exit = 0,
+    list_books = 1,
+    add_book = 2,
+    borrow_book = 3,
+    return_book = 4,
+    remove_book = 5,
+    search_title = 6,
+    find_by_id = 7,
+    list_by_year = 8,
+    list_available = 9,
+    search_author = 10,
+    search_year = 11,
+    search_author_and_year = 12,
+    search_borrowed = 13,
+    search_author_and_borrowed = 14
+};
 
-    enum class MenuAction {
-        continue_running,
-        exit_success,
-        exit_failure
-    };
+enum class MenuAction {
+    continue_running,
+    exit_success,
+    exit_failure
+};
 
-    bool read_int(int& value) {
-        if (std::cin >> value) {
-            std::cin.ignore(
-                std::numeric_limits<std::streamsize>::max(),
-                '\n');
-            return true;
-        }
-
-        if (std::cin.eof()) {
-            return false;
-        }
-
-        std::cin.clear();
+bool read_int(int& value) {
+    if (std::cin >> value) {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::cout << "Please enter a number.\n";
+        return true;
+    }
+
+    if (std::cin.eof()) {
         return false;
     }
 
-    std::string read_line(const std::string& prompt) {
-		std::cout << prompt;
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cout << "Please enter a number.\n";
+    return false;
+}
 
-		std::string line;
-		std::getline(std::cin, line);
-		return line;
+std::string read_line(const std::string& prompt) {
+    std::cout << prompt;
+
+    std::string line;
+    std::getline(std::cin, line);
+    return line;
+}
+
+void print_menu() {
+    std::cout << "\nLibrary manager\n"
+              << "1. List books\n"
+              << "2. Add book\n"
+              << "3. Borrow book\n"
+              << "4. Return book\n"
+              << "5. Remove book\n"
+              << "6. Search by title\n"
+              << "7. Find book by id\n"
+              << "8. List books by year\n"
+              << "9. List available books\n"
+              << "10. Search by author\n"
+              << "11. Search by year\n"
+              << "12. Search by author and year\n"
+              << "13. Search by borrowed\n"
+              << "14. Search by author and borrowed status\n"
+              << "0. Exit\n"
+              << "Choose: ";
+}
+
+void print_book(const library::Book& book) {
+    std::cout << book.id << " | " << book.title << " | " << book.author << " | "
+              << book.publication_year << " | " << (book.borrowed ? "borrowed" : "available")
+              << '\n';
+}
+
+void list_books(const library::LibraryService& service) {
+    if (service.all_books().empty()) {
+        std::cout << "No books yet.\n";
+        return;
     }
 
-    void print_menu() {
-        std::cout << "\nLibrary manager\n"
-            << "1. List books\n"
-            << "2. Add book\n"
-            << "3. Borrow book\n"
-            << "4. Return book\n"
-            << "5. Remove book\n"
-            << "6. Search by title\n"
-            << "7. Find book by id\n"
-            << "8. List books by year\n"
-            << "9. List available books\n"
-            << "10. Search by author\n"
-			<< "11. Search by year\n"
-            << "12. Search by author and year\n"
-			<< "13. Search by borrowed\n"
-            << "14. Search by author and borrowed status\n"
-            << "0. Exit\n"
-            << "Choose: ";
+    for (const auto& book : service.all_books()) {
+        print_book(book);
+    }
+}
+
+void add_book(library::LibraryService& service) {
+    library::Book book;
+    std::cout << "Id: ";
+    if (!read_int(book.id)) {
+        return;
     }
 
-    void print_book(const library::Book& book) {
-        std::cout << book.id << " | "
-            << book.title << " | "
-            << book.author << " | "
-            << book.publication_year << " | "
-            << (book.borrowed ? "borrowed" : "available")
-            << '\n';
-    }
-    
-    void list_books(const library::LibraryService& service) {
-        if (service.all_books().empty()) {
-            std::cout << "No books yet.\n";
-            return;
-        }
-
-        for (const auto& book : service.all_books()) {
-            print_book(book);
-        }
+    book.title = read_line("Title: ");
+    if (book.title.empty()) {
+        std::cout << "Title cannot be empty.\n";
+        return;
     }
 
-    void add_book(library::LibraryService& service) {
-        library::Book book;
-        std::cout << "Id: ";
-        if (!read_int(book.id)) {
-            return;
-        }
+    book.author = read_line("Author: ");
+    if (book.author.empty()) {
+        std::cout << "Author cannot be empty.\n";
+        return;
+    }
+    std::cout << "Publication year: ";
 
-		book.title = read_line("Title: ");
-        if (book.title.empty()) {
-            std::cout << "Title cannot be empty.\n";
-            return;
-        }
-
-		book.author = read_line("Author: ");
-        if (book.author.empty()) {
-            std::cout << "Author cannot be empty.\n";
-            return;
-        }
-        std::cout << "Publication year: ";
-
-        if (!read_int(book.publication_year)) {
-            return;
-        }
-
-        std::cout << (service.add_book(std::move(book)) ? "Book added.\n" : "Invalid or duplicate book.\n");
+    if (!read_int(book.publication_year)) {
+        return;
     }
 
-    void update_borrow_status(library::LibraryService& service, bool borrow) {
-        int id{};
-        std::cout << "Book id: ";
-        if (!read_int(id)) {
-            return;
-        }
-        bool success{};
-        if (borrow) {
-            success = service.borrow_book(id);
-        }
-        else {
-            success = service.return_book(id);
-        }
-        std::cout << (success ? "Done.\n" : "Operation failed.\n");
+    std::cout << (service.add_book(std::move(book)) ? "Book added.\n"
+                                                    : "Invalid or duplicate book.\n");
+}
+
+void update_borrow_status(library::LibraryService& service, bool borrow) {
+    int id{};
+    std::cout << "Book id: ";
+    if (!read_int(id)) {
+        return;
+    }
+    bool success{};
+    if (borrow) {
+        success = service.borrow_book(id);
+    } else {
+        success = service.return_book(id);
+    }
+    std::cout << (success ? "Done.\n" : "Operation failed.\n");
+}
+
+void remove_book_from_library(library::LibraryService& service) {
+    int id{};
+    std::cout << "Book id: ";
+    if (!read_int(id)) {
+        return;
+    }
+    const bool success = service.remove_book(id);
+    std::cout << (success ? "Book removed.\n" : "Book not found.\n");
+}
+
+void search_books_by_title(const library::LibraryService& service) {
+    std::string keyword = read_line("Title keyword: ");
+
+    const auto matches = service.search_by_title(keyword);
+
+    std::cout << "Matches: " << matches.size() << "\n";
+
+    for (const auto& book : matches) {
+        print_book(book);
+    }
+}
+
+void find_book_by_id(const library::LibraryService& service) {
+    int id{};
+    std::cout << "Book id: ";
+
+    if (!read_int(id)) {
+        return;
     }
 
-    void remove_book_from_library(library::LibraryService& service) {
-        int id{};
-        std::cout << "Book id: ";
-        if (!read_int(id)) {
-            return;
-        }
-        const bool success = service.remove_book(id);
-        std::cout << (success ? "Book removed.\n" : "Book not found.\n");
+    const auto book = service.find_by_id(id);
+    if (!book) {
+        std::cout << "Book not found.\n";
+        return;
     }
 
-    void search_books_by_title(const library::LibraryService& service) {
-		std::string keyword = read_line("Title keyword: ");
+    print_book(*book);
+}
 
-        const auto matches = service.search_by_title(keyword);
+void list_books_by_year(const library::LibraryService& service) {
+    const auto books = service.books_sorted_by_year();
 
-        std::cout << "Matches: " << matches.size() << "\n";
-
-        for (const auto& book : matches) {
-            print_book(book);
-        }
+    if (books.empty()) {
+        std::cout << "No books yet.\n";
+        return;
     }
 
-    void find_book_by_id(const library::LibraryService& service) {
-        int id{};
-        std::cout << "Book id: ";
+    for (const auto& book : books) {
+        print_book(book);
+    }
+}
 
-        if (!read_int(id)) {
-            return;
-        }
+void list_available_books(const library::LibraryService& service) {
+    const auto books = service.available_books();
 
-        const auto book = service.find_by_id(id);
-        if (!book) {
-            std::cout << "Book not found.\n";
-            return;
-        }
-
-        print_book(*book);
+    if (books.empty()) {
+        std::cout << "No available books.\n";
+        return;
     }
 
-    void list_books_by_year(const library::LibraryService& service) {
-        const auto books = service.books_sorted_by_year();
+    for (const auto& book : books) {
+        print_book(book);
+    }
+}
 
-        if (books.empty()) {
-            std::cout << "No books yet.\n";
-            return;
-        }
+void search_books_by_author(const library::LibraryService& service) {
+    std::string keyword = read_line("Author keyword: ");
 
-        for (const auto& book : books) {
-            print_book(book);
-        }
+    const auto matches = service.search_by_author(keyword);
+
+    std::cout << "Matches: " << matches.size() << "\n";
+
+    for (const auto& book : matches) {
+        print_book(book);
+    }
+}
+
+void search_books_by_year(const library::LibraryService& service) {
+    int year{};
+    std::cout << "Publication year: ";
+
+    if (!read_int(year)) {
+        return;
     }
 
-    void list_available_books(const library::LibraryService& service) {
-        const auto books = service.available_books();
+    const auto matches = service.search_by_year(year);
+    std::cout << "Matches: " << matches.size() << "\n";
 
-        if (books.empty()) {
-            std::cout << "No available books.\n";
-            return;
-        }
+    for (const auto& book : matches) {
+        print_book(book);
+    }
+}
 
-        for (const auto& book : books) {
-            print_book(book);
-        }
+void search_by_author_and_year(const library::LibraryService& service) {
+    std::string keyword = read_line("Author keyword: ");
+
+    int year{};
+    std::cout << "Publication year: ";
+
+    if (!read_int(year)) {
+        return;
     }
 
-    void search_books_by_author(
-        const library::LibraryService& service) {
-        std::string keyword = read_line("Author keyword: ");
+    const auto matches = service.search_by_author_and_year(keyword, year);
+    std::cout << "Matches: " << matches.size() << "\n";
 
-        const auto matches = service.search_by_author(keyword);
+    for (const auto& book : matches) {
+        print_book(book);
+    }
+}
 
-        std::cout << "Matches: " << matches.size() << "\n";
+void search_by_borrowed(const library::LibraryService& service) {
+    int choice{};
 
-        for (const auto& book : matches) {
-            print_book(book);
-        }
+    std::cout << "Enter 1 for borrowed, 0 for available: ";
+    if (!read_int(choice) || (choice != 0 && choice != 1)) {
+        std::cout << "Please enter 1 or 0.\n";
+        return;
     }
 
-    void search_books_by_year(
-        const library::LibraryService& service) {
-		int year{};
-		std::cout << "Publication year: ";
+    const bool borrowed = choice == 1;
+    const auto matches = service.search_by_borrowed(borrowed);
+    std::cout << "Matches: " << matches.size() << "\n";
 
-        if (!read_int(year)) {
-			return;
-        }
-
-		const auto matches = service.search_by_year(year);
-		std::cout << "Matches: " << matches.size() << "\n";
-
-        for (const auto& book : matches) {
-            print_book(book);
-        }
+    for (const auto& book : matches) {
+        print_book(book);
     }
-    
-    void search_by_author_and_year(const library::LibraryService& service) {
-		std::string keyword = read_line("Author keyword: ");
+}
 
-        int year{};
-        std::cout << "Publication year: ";
+void search_by_author_and_borrowed(const library::LibraryService& service) {
+    std::string keyword = read_line("Author keyword: ");
 
-        if (!read_int(year)) {
-            return;
-        }
+    int choice{};
+    std::cout << "Enter 1 for borrowed, 0 for available: ";
 
-        const auto matches = service.search_by_author_and_year(keyword, year);
-        std::cout << "Matches: " << matches.size() << "\n";
-
-        for (const auto& book : matches) {
-            print_book(book);
-        }
+    if (!read_int(choice) || (choice != 0 && choice != 1)) {
+        std::cout << "Please enter 1 or 0.\n";
+        return;
     }
 
-    void search_by_borrowed(const library::LibraryService& service) {
-		int  choice{};
+    const bool borrowed = choice == 1;
+    const auto matches = service.search_by_author_and_borrowed(keyword, borrowed);
+    std::cout << "Matches: " << matches.size() << "\n";
 
-        std::cout << "Enter 1 for borrowed, 0 for available: ";
-        if (!read_int(choice) || (choice != 0 && choice != 1)) {
-            std::cout << "Please enter 1 or 0.\n";
-            return;
-        }
+    for (const auto& book : matches) {
+        print_book(book);
+    }
+}
 
-        const bool borrowed = choice == 1;
-		const auto matches = service.search_by_borrowed(borrowed);
-		std::cout << "Matches: " << matches.size() << "\n";
-
-        for (const auto& book : matches) {
-            print_book(book);
-        }
+bool save_library(const library::LibraryService& service, const std::string& file_path) {
+    if (library::save_books_to_file(service.all_books(), file_path)) {
+        return true;
     }
 
-    void search_by_author_and_borrowed(
-        const library::LibraryService& service) {
-        std::string keyword = read_line("Author keyword: ");
+    std::cerr << "Failed to save books.\n";
+    return false;
+}
 
-        int choice{};
-        std::cout << "Enter 1 for borrowed, 0 for available: ";
+bool load_library(library::LibraryService& service, const std::string& file_path) {
+    const auto result = library::load_books_from_file(file_path);
 
-        if (!read_int(choice) || (choice != 0 && choice != 1)) {
-            std::cout << "Please enter 1 or 0.\n";
-            return;
+    switch (result.status) {
+    case library::LoadStatus::success:
+        for (const auto& book : result.books) {
+            service.add_book(book);
         }
-
-        const bool borrowed = choice == 1;
-        const auto matches =
-            service.search_by_author_and_borrowed(keyword, borrowed);
-        std::cout << "Matches: " << matches.size() << "\n";
-
-        for (const auto& book : matches) {
-            print_book(book);
-        }
-    }
-
-    bool save_library(const library::LibraryService& service, const std::string& file_path) {
-        if (library::save_books_to_file(service.all_books(), file_path)) {
-            return true;
-        }
-
-        std::cerr << "Failed to save books.\n";
+        return true;
+    case library::LoadStatus::file_not_found:
+        return true;
+    case library::LoadStatus::open_error:
+        std::cerr << "Failed to open books file.\n";
+        return false;
+    case library::LoadStatus::invalid_format:
+        std::cerr << "Books file has invalid format.\n";
+        return false;
+    default:
+        std::cerr << "Unknown books loading error.\n";
         return false;
     }
+}
 
-    bool load_library(
-        library::LibraryService& service,
-        const std::string& file_path) {
-        const auto result = library::load_books_from_file(file_path);
-
-        switch (result.status) {
-        case library::LoadStatus::success:
-            for (const auto& book : result.books) {
-                service.add_book(book);
-            }
-            return true;
-        case library::LoadStatus::file_not_found:
-            return true;
-        case library::LoadStatus::open_error:
-            std::cerr << "Failed to open books file.\n";
-            return false;
-        case library::LoadStatus::invalid_format:
-            std::cerr << "Books file has invalid format.\n";
-            return false;
-        default:
-            std::cerr << "Unknown books loading error.\n";
-            return false;
-        }
+MenuAction handle_menu_choice(int choice, library::LibraryService& service,
+                              const std::string& file_path) {
+    switch (static_cast<MenuChoice>(choice)) {
+    case MenuChoice::exit:
+        return save_library(service, file_path) ? MenuAction::exit_success
+                                                : MenuAction::exit_failure;
+    case MenuChoice::list_books:
+        list_books(service);
+        break;
+    case MenuChoice::add_book:
+        add_book(service);
+        break;
+    case MenuChoice::borrow_book:
+        update_borrow_status(service, true);
+        break;
+    case MenuChoice::return_book:
+        update_borrow_status(service, false);
+        break;
+    case MenuChoice::remove_book:
+        remove_book_from_library(service);
+        break;
+    case MenuChoice::search_title:
+        search_books_by_title(service);
+        break;
+    case MenuChoice::find_by_id:
+        find_book_by_id(service);
+        break;
+    case MenuChoice::list_by_year:
+        list_books_by_year(service);
+        break;
+    case MenuChoice::list_available:
+        list_available_books(service);
+        break;
+    case MenuChoice::search_author:
+        search_books_by_author(service);
+        break;
+    case MenuChoice::search_year:
+        search_books_by_year(service);
+        break;
+    case MenuChoice::search_author_and_year:
+        search_by_author_and_year(service);
+        break;
+    case MenuChoice::search_borrowed:
+        search_by_borrowed(service);
+        break;
+    case MenuChoice::search_author_and_borrowed:
+        search_by_author_and_borrowed(service);
+        break;
+    default:
+        std::cout << "Unknown choice.\n";
+        break;
     }
 
-    MenuAction handle_menu_choice(
-        int choice,
-        library::LibraryService& service,
-        const std::string& file_path) {
-        switch (static_cast<MenuChoice>(choice)) {
-        case MenuChoice::exit:
-            return save_library(service, file_path)
-                ? MenuAction::exit_success
-                : MenuAction::exit_failure;
-        case MenuChoice::list_books:
-            list_books(service);
-            break;
-        case MenuChoice::add_book:
-            add_book(service);
-            break;
-        case MenuChoice::borrow_book:
-            update_borrow_status(service, true);
-            break;
-        case MenuChoice::return_book:
-            update_borrow_status(service, false);
-            break;
-        case MenuChoice::remove_book:
-            remove_book_from_library(service);
-            break;
-        case MenuChoice::search_title:
-            search_books_by_title(service);
-            break;
-        case MenuChoice::find_by_id:
-            find_book_by_id(service);
-            break;
-        case MenuChoice::list_by_year:
-            list_books_by_year(service);
-            break;
-        case MenuChoice::list_available:
-            list_available_books(service);
-            break;
-        case MenuChoice::search_author:
-            search_books_by_author(service);
-            break;
-        case MenuChoice::search_year:
-            search_books_by_year(service);
-            break;
-        case MenuChoice::search_author_and_year:
-            search_by_author_and_year(service);
-            break;
-        case MenuChoice::search_borrowed:
-            search_by_borrowed(service);
-            break;
-        case MenuChoice::search_author_and_borrowed:
-            search_by_author_and_borrowed(service);
-            break;
-        default:
-            std::cout << "Unknown choice.\n";
-            break;
-        }
+    return MenuAction::continue_running;
+}
 
-        return MenuAction::continue_running;
-    }
-
-}  // namespace
+} // namespace
 
 int main() {
     const std::string file_path = "books.txt";
@@ -408,8 +394,7 @@ int main() {
             continue;
         }
 
-        const MenuAction action =
-            handle_menu_choice(choice, service, file_path);
+        const MenuAction action = handle_menu_choice(choice, service, file_path);
 
         if (action == MenuAction::exit_success) {
             return 0;

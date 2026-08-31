@@ -39,8 +39,7 @@ void test_save_and_load_books() {
 
     const std::string file_path = "test_books.txt";
 
-    const bool save_success =
-        library::save_books_to_file(service.all_books(), file_path);
+    const bool save_success = library::save_books_to_file(service.all_books(), file_path);
 
     expect(save_success, "saving books should succeed");
 
@@ -51,8 +50,7 @@ void test_save_and_load_books() {
 
     const auto load_result = library::load_books_from_file(file_path);
 
-    expect(load_result.status == library::LoadStatus::success,
-           "loading should report success");
+    expect(load_result.status == library::LoadStatus::success, "loading should report success");
 
     if (load_result.books.size() != 2) {
         expect(false, "loading should restore two books");
@@ -60,21 +58,18 @@ void test_save_and_load_books() {
         return;
     }
 
-    expect(load_result.books[0].title == "C++ Primer" &&
-               load_result.books[1].borrowed,
+    expect(load_result.books[0].title == "C++ Primer" && load_result.books[1].borrowed,
            "loading should restore book data");
 
     std::remove(file_path.c_str());
 }
 
 void test_load_missing_file() {
-    const auto result =
-        library::load_books_from_file("file_that_does_not_exist.txt");
+    const auto result = library::load_books_from_file("file_that_does_not_exist.txt");
 
     expect(result.status == library::LoadStatus::file_not_found,
            "loading a missing file should report file_not_found");
-    expect(result.books.empty(),
-           "loading a missing file should return no books");
+    expect(result.books.empty(), "loading a missing file should return no books");
 }
 
 void test_load_invalid_file() {
@@ -111,8 +106,7 @@ void test_load_empty_file() {
 
     const auto result = library::load_books_from_file(file_path);
 
-    expect(result.status == library::LoadStatus::success,
-           "an empty file should report success");
+    expect(result.status == library::LoadStatus::success, "an empty file should report success");
     expect(result.books.empty(), "an empty file should return no books");
 
     const int remove_result = std::remove(file_path.c_str());
@@ -120,7 +114,7 @@ void test_load_empty_file() {
     expect(remove_result == 0, "temporary file should be removed");
 }
 
-} //namespace
+} // namespace
 
 int main() {
     test_save_books();
