@@ -13,7 +13,9 @@
 - 使用 `unordered_map` 索引加速按 ID 查找
 - 启动时从 `books.txt` 读取数据，退出时保存数据
 - 使用 CTest 运行自动化测试
+- 使用 GoogleTest 编写服务层和持久化测试
 - 使用 `.clang-format` 统一 C++ 代码风格
+- 使用 clang-tidy 和 GitHub Actions 做持续检查
 
 ## 项目结构
 
@@ -29,7 +31,8 @@ my first project/
 │   ├── book_storage.cpp            # 文件读写实现
 │   └── library_service.cpp         # 图书业务实现
 ├── tests/
-│   └── library_service_test.cpp    # 单元测试
+│   ├── library_service_gtest.cpp   # LibraryService 测试
+│   └── book_storage_gtest.cpp       # 文件持久化测试
 ├── docs/
 │   └── learning-roadmap.md         # 学习路线和练习记录
 ├── CMakeLists.txt                  # CMake 构建规则
@@ -42,7 +45,8 @@ my first project/
 library_service.cpp ─┐
 book_storage.cpp ────┼──> library_core
                      ├──> library_cli
-library_service_test ─┘     library_tests
+library_service_gtest ─┐
+book_storage_gtest ────┴──> GoogleTest + CTest
 ```
 
 业务逻辑位于 `library_core`，命令行程序和测试程序通过 CMake 链接这个库。
@@ -56,7 +60,7 @@ Windows 开发环境需要：
 - Ninja
 - Git
 
-Visual Studio 已经可以提供其中的大部分组件。也可以使用其他编辑器，但必须能找到 C++ 编译器、CMake 和 Ninja。
+Visual Studio 已经可以提供其中的大部分组件。也可以使用其他编辑器，但必须能找到 C++ 编译器、CMake 和 Ninja。第一次配置时，CMake 会从 GitHub 下载固定版本的 GoogleTest。
 
 ## 构建、运行和测试
 
@@ -85,7 +89,7 @@ ctest --preset default --output-on-failure
 3. `src/library_service.cpp`：理解查找、筛选、排序和状态修改。
 4. `app/main.cpp`：理解菜单、输入处理和业务调用。
 5. `include/library/book_storage.hpp` 与 `src/book_storage.cpp`：理解文件保存和读取。
-6. `tests/library_service_test.cpp`：理解测试如何验证行为。
+6. `tests/library_service_gtest.cpp` 与 `tests/book_storage_gtest.cpp`：理解 GoogleTest 如何验证行为。
 7. `docs/learning-roadmap.md`：按练习路线继续扩展。
 
 ## 学习原则
@@ -94,4 +98,4 @@ ctest --preset default --output-on-failure
 
 ## 当前状态
 
-第一阶段学习项目已经完成，主线包含核心图书功能、CMake 模块化、CTest 测试、Git 工作流和文件持久化。下一阶段重点是减少提示，独立完成需求拆解、实现、测试和提交。
+第一阶段学习项目已经完成，主线包含核心图书功能、CMake 模块化、GoogleTest、CTest、Git 工作流、静态检查和文件持久化。下一阶段重点是减少提示，独立完成需求拆解、实现、测试和提交。

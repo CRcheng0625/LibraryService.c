@@ -26,7 +26,7 @@
 
 - CMake target、include directory 和链接关系
 - `library_core` 静态库的模块化构建
-- CTest 和手写测试断言
+- CTest 和 GoogleTest 测试断言
 - Visual Studio 调试器和断点
 - Git 分支、提交、合并和推送
 
@@ -35,7 +35,7 @@
 - `vector` 按 ID 顺序查找的复杂度是 O(n)
 - `unordered_map<int, std::size_t>` 平均用 O(1) 定位 `vector` 下标
 - `id_index_` 保存“书籍 ID → `books_` 下标”的映射
-- 添加或删除导致 `books_` 位置变化后，必须重建索引
+- 添加新书时增量更新索引；删除后因 `vector` 下标移动而重建索引
 - `find_by_id` 只查询，不修改索引
 - 用删除中间元素的测试验证索引不变量
 
@@ -94,7 +94,7 @@
 
 ### 练习 4：测试框架升级
 
-在理解当前手写 `expect` 测试后，接入 GoogleTest 或 Catch2，比较测试发现、断言和 CMake 集成方式。
+在理解手写 `expect` 测试后接入 GoogleTest，使用 `TEST`、`EXPECT`、`ASSERT` 和 `gtest_discover_tests`。
 
 ### 练习 5：工程化
 
@@ -102,6 +102,8 @@
 - 使用 clang-tidy 进行静态检查
 - 用 GitHub Actions 自动构建和运行测试
 - 为 README 增加构建状态和使用说明
+
+练习 1 至 4 已完成。练习 5 的本地格式化、clang-tidy 和 GitHub Actions 已接入，下一步重点是持续维护 CI 和编写独立功能。
 
 ## 实习生水平检查表
 
