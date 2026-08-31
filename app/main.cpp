@@ -26,6 +26,12 @@ namespace {
         search_author_and_borrowed = 14
     };
 
+    enum class MenuAction {
+        continue_running,
+        exit_success,
+        exit_failure
+    };
+
     bool read_int(int& value) {
         if (std::cin >> value) {
             std::cin.ignore(
@@ -297,38 +303,15 @@ namespace {
         return false;
     }
 
-    }  // namespace
-
-int main() {
-    const std::string file_path = "books.txt";
-    library::LibraryService service;
-
-    const auto load_result = library::load_books_from_file(file_path);
-
-    if (load_result.status == library::LoadStatus::success ||
-        load_result.status == library::LoadStatus::file_not_found) {
-        for (const auto& book : load_result.books) {
-            service.add_book(book);
-        }
-    } else {
-        std::cerr << "Failed to load books: file is unavailable or invalid.\n";
-        return 1;
-    }
-
-    while (true) {
-        print_menu();
-        int choice{};
-        if (!read_int(choice)) {
-            if (std::cin.eof()) {
-                return save_library(service, file_path) ? 0 : 1;
-            }
-
-            continue;
-        }
-
+    MenuAction handle_menu_choice(
+        int choice,
+        library::LibraryService& service,
+        const std::string& file_path) {
         switch (static_cast<MenuChoice>(choice)) {
         case MenuChoice::exit:
-            return save_library(service, file_path) ? 0 : 1;
+            return save_library(service, file_path)
+                ? MenuAction::exit_success
+                : MenuAction::exit_failure;
         case MenuChoice::list_books:
             list_books(service);
             break;
@@ -373,6 +356,50 @@ int main() {
             break;
         default:
             std::cout << "Unknown choice.\n";
+            break;
+        }
+
+        return MenuAction::continue_running;
+    }
+
+}  // namespace
+
+int main() {
+    const std::string file_path = "books.txt";
+    library::LibraryService service;
+
+    const auto load_result = library::load_books_from_file(file_path);
+
+    if (load_result.status == library::LoadStatus::success ||
+        load_result.status == library::LoadStatus::file_not_found) {
+        for (const auto& book : load_result.books) {
+            service.add_book(book);
+        }
+    } else {
+        std::cerr << "Failed to load books: file is unavailable or invalid.\n";
+        return 1;
+    }
+
+    while (true) {
+        print_menu();
+        int choice{};
+        if (!read_int(choice)) {
+            if (std::cin.eof()) {
+                return save_library(service, file_path) ? 0 : 1;
+            }
+
+            continue;
+        }
+
+        const MenuAction action =
+            handle_menu_choice(choice, service, file_path);
+
+        if (action == MenuAction::exit_success) {
+            return 0;
+        }
+
+        if (action == MenuAction::exit_failure) {
+            return 1;
         }
     }
 }

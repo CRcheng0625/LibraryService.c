@@ -1,4 +1,5 @@
 build/
+books.txt
 out/
 .vs/
 .vscode/
