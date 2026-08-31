@@ -31,9 +31,26 @@ target_link_libraries(lookup_benchmark PRIVATE library_core)
 include(CTest)
 
 if(BUILD_TESTING)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.15.2.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    include(GoogleTest)
+
     add_executable(library_tests tests/library_service_test.cpp)
     target_link_libraries(library_tests PRIVATE library_core)
     add_test(NAME library_service_tests COMMAND library_tests)
+
+    add_executable(library_gtest tests/library_service_gtest.cpp)
+    target_link_libraries(library_gtest PRIVATE library_core GTest::gtest_main)
+    gtest_discover_tests(library_gtest)
 
     add_executable(book_storage_tests tests/book_storage_test.cpp)
     target_link_libraries(book_storage_tests PRIVATE library_core)
