@@ -26,7 +26,7 @@ enum class MenuChoice : unsigned char {
     search_author_and_borrowed = 14
 };
 
-enum class MenuAction {
+    enum class MenuAction : unsigned char {
     continue_running,
     exit_success,
     exit_failure
@@ -375,7 +375,7 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 
 } // namespace
 
-int main() {
+int main() {  // NOLINT(bugprone-exception-escape): iostream owns this boundary.
     const std::string file_path = "books.txt";
     library::LibraryService service;
 
