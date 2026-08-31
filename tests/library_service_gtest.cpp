@@ -24,6 +24,18 @@ TEST(LibraryServiceTest, RejectsDuplicateId) {
     EXPECT_EQ(service.all_books().size(), 1U);
 }
 
+TEST(LibraryServiceTest, RejectsInvalidBookData) {
+    library::LibraryService service;
+
+    EXPECT_FALSE(service.add_book(
+        {0, "Invalid id", "Author", 2020, false}));
+    EXPECT_FALSE(service.add_book(
+        {-1, "Negative id", "Author", 2020, false}));
+    EXPECT_FALSE(service.add_book(
+        {2, "", "Author", 2020, false}));
+    EXPECT_TRUE(service.all_books().empty());
+}
+
 TEST(LibraryServiceTest, BorrowsAndReturnsBook) {
     library::LibraryService service;
     ASSERT_TRUE(service.add_book(
@@ -32,6 +44,16 @@ TEST(LibraryServiceTest, BorrowsAndReturnsBook) {
     EXPECT_TRUE(service.borrow_book(7));
     EXPECT_FALSE(service.borrow_book(7));
     EXPECT_TRUE(service.return_book(7));
+}
+
+TEST(LibraryServiceTest, RejectsInvalidBorrowAndReturnOperations) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book(
+        {7, "Effective Modern C++", "Scott Meyers", 2014, false}));
+
+    EXPECT_FALSE(service.borrow_book(99));
+    EXPECT_FALSE(service.return_book(7));
+    EXPECT_FALSE(service.return_book(99));
 }
 
 TEST(LibraryServiceTest, SearchesCaseInsensitively) {
@@ -46,6 +68,16 @@ TEST(LibraryServiceTest, SearchesCaseInsensitively) {
     ASSERT_EQ(matches.size(), 2U);
     EXPECT_EQ(matches[0].id, 1);
     EXPECT_EQ(matches[1].id, 2);
+}
+
+TEST(LibraryServiceTest, ReturnsNoResultsForUnknownSearch) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book(
+        {1, "Algorithms", "Robert Sedgewick", 2011, false}));
+
+    EXPECT_TRUE(service.search_by_title("Python").empty());
+    EXPECT_TRUE(service.search_by_author("Unknown").empty());
+    EXPECT_TRUE(service.search_by_year(1990).empty());
 }
 
 TEST(LibraryServiceTest, RebuildsIndexAfterMiddleRemoval) {
