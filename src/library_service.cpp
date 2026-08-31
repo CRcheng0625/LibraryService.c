@@ -79,6 +79,27 @@ bool LibraryService::return_book(int id) {
     return true;
 }
 
+bool LibraryService::update_book(int id, std::string title, std::string author,
+                                 int publication_year) {
+    if (title.empty() || author.empty()) {
+        return false;
+    }
+
+    const auto index_it = id_index_.find(id);
+
+    if (index_it == id_index_.end() || index_it->second >= books_.size()) {
+        return false;
+    }
+
+    Book& book = books_[index_it->second];
+
+    book.title = std::move(title);
+    book.author = std::move(author);
+    book.publication_year = publication_year;
+
+    return true;
+}
+
 std::optional<Book> LibraryService::find_by_id(int id) const {
     const auto index_it = id_index_.find(id);
     if (index_it == id_index_.end()) {

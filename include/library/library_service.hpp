@@ -3,6 +3,7 @@
 #include "library/book.hpp"
 
 #include <optional>
+#include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
@@ -15,6 +16,7 @@ class LibraryService {
     bool remove_book(int id);
     bool borrow_book(int id);
     bool return_book(int id);
+    bool update_book(int id, std::string title, std::string author, int publication_year);
 
     [[nodiscard]] std::optional<Book> find_by_id(int id) const;
     [[nodiscard]] std::vector<Book> search_by_title(std::string_view keyword) const;

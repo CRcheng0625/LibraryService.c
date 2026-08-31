@@ -23,10 +23,11 @@ enum class MenuChoice : unsigned char {
     search_year = 11,
     search_author_and_year = 12,
     search_borrowed = 13,
-    search_author_and_borrowed = 14
+    search_author_and_borrowed = 14,
+    update_book = 15
 };
 
-    enum class MenuAction : unsigned char {
+enum class MenuAction : unsigned char {
     continue_running,
     exit_success,
     exit_failure
@@ -72,6 +73,7 @@ void print_menu() {
               << "12. Search by author and year\n"
               << "13. Search by borrowed\n"
               << "14. Search by author and borrowed status\n"
+              << "15. Update book\n"
               << "0. Exit\n"
               << "Choose: ";
 }
@@ -119,6 +121,35 @@ void add_book(library::LibraryService& service) {
 
     std::cout << (service.add_book(std::move(book)) ? "Book added.\n"
                                                     : "Invalid or duplicate book.\n");
+}
+
+void update_book_in_library(library::LibraryService& service) {
+    int id{};
+    std::cout << "Book id: ";
+    if (!read_int(id)) {
+        return;
+    }
+
+    const auto existing_book = service.find_by_id(id);
+    if (!existing_book) {
+        std::cout << "Book not found.\n";
+        return;
+    }
+
+    std::cout << "Current book: ";
+    print_book(*existing_book);
+
+    const std::string title = read_line("New title: ");
+    const std::string author = read_line("New author: ");
+
+    int publication_year{};
+    std::cout << "New publication year: ";
+    if (!read_int(publication_year)) {
+        return;
+    }
+
+    const bool success = service.update_book(id, title, author, publication_year);
+    std::cout << (success ? "Book updated.\n" : "Invalid book data.\n");
 }
 
 void update_borrow_status(library::LibraryService& service, bool borrow) {
@@ -365,6 +396,9 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
     case MenuChoice::search_author_and_borrowed:
         search_by_author_and_borrowed(service);
         break;
+    case MenuChoice::update_book:
+        update_book_in_library(service);
+        break;
     default:
         std::cout << "Unknown choice.\n";
         break;
@@ -375,7 +409,7 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 
 } // namespace
 
-int main() {  // NOLINT(bugprone-exception-escape): iostream owns this boundary.
+int main() { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
     const std::string file_path = "books.txt";
     library::LibraryService service;
 
