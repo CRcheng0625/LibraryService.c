@@ -253,3 +253,20 @@ TEST(LibraryServiceTest, FilterReturnsNoMatches) {
 
     EXPECT_TRUE(matches.empty());
 }
+
+TEST(LibraryServiceTest, FiltersByTitleAndBorrowedStatus) {
+    library::LibraryService service;
+
+    ASSERT_TRUE(service.add_book({1, "C++ Primer", "Author A", 2012, false}));
+    ASSERT_TRUE(service.add_book({2, "C++ Primer", "Author B", 2012, true}));
+    ASSERT_TRUE(service.add_book({3, "Clean Code", "Author C", 2008, false}));
+
+    library::BookFilter filter;
+    filter.title_keyword = "c++";
+    filter.borrowed = false;
+
+    const auto matches = service.filter_books(filter);
+
+    ASSERT_EQ(matches.size(), 1U);
+    EXPECT_EQ(matches.front().id, 1);
+}
