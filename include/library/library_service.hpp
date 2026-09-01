@@ -17,6 +17,13 @@ struct BookPage {
     bool has_next{};
 };
 
+struct BookFilter {
+    std::optional<std::string> title_keyword;
+    std::optional<std::string> author_keyword;
+    std::optional<int> publication_year;
+    std::optional<bool> borrowed;
+};
+
 class LibraryService {
   public:
     bool add_book(Book book);
@@ -37,6 +44,7 @@ class LibraryService {
     [[nodiscard]] std::vector<Book> available_books() const;
     [[nodiscard]] BookPage books_page(std::size_t offset, std::size_t limit) const;
     [[nodiscard]] const std::vector<Book>& all_books() const noexcept;
+    [[nodiscard]] std::vector<Book> filter_books(const BookFilter& filter) const;
 
   private:
     void rebuild_index();

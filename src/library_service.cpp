@@ -224,4 +224,42 @@ BookPage LibraryService::books_page(std::size_t offset, std::size_t limit) const
     return page;
 }
 
+std::vector<Book> LibraryService::filter_books(const BookFilter& filter) const {
+
+    std::optional<std::string> normalized_title;
+    if (filter.title_keyword.has_value()) {
+        normalized_title = to_lower(*filter.title_keyword);
+    }
+
+    std::optional<std::string> normalized_author;
+    if (filter.author_keyword.has_value()) {
+        normalized_author = to_lower(*filter.author_keyword);
+    }
+
+    std::vector<Book> matches;
+
+    std::copy_if(books_.begin(), books_.end(),
+        std::back_inserter(matches),
+                 [&filter, &normalized_title, &normalized_author](const Book& book) {
+                     if (normalized_title.has_value() &&
+                         to_lower(book.title).find(*normalized_title) == std::string::npos) {
+                         return false;
+                     }
+                     if (normalized_author.has_value() &&
+                         to_lower(book.author).find(*normalized_author) == std::string::npos) {
+                         return false;
+                     }
+                     if (filter.publication_year.has_value() &&
+                         book.publication_year != *filter.publication_year) {
+                         return false;
+                     }
+                     if (filter.borrowed.has_value() &&
+                         book.borrowed != *filter.borrowed) {
+                         return false;
+                     }
+                     return true;
+                 });
+    return matches;
+}
+
 } // namespace library
