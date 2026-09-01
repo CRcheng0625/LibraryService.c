@@ -27,7 +27,8 @@ enum class MenuChoice : unsigned char {
     search_author_and_borrowed = 14,
     update_book = 15,
     list_by_title = 16,
-    list_page = 17
+    list_page = 17,
+    filter_books = 18
 };
 
 enum class MenuAction : unsigned char {
@@ -79,6 +80,7 @@ void print_menu() {
               << "15. Update book\n"
               << "16. List books by title\n"
               << "17. List books by page\n"
+              << "18. Filter books\n"
               << "0. Exit\n"
               << "Choose: ";
 }
@@ -377,6 +379,55 @@ void search_by_author_and_borrowed(const library::LibraryService& service) {
     }
 }
 
+void filter_books_in_library(const library::LibraryService& service) {
+    library::BookFilter filter;
+
+    const std::string title = read_line("Title keyword (empty for any): ");
+    if (!title.empty()) {
+        filter.title_keyword = title;
+    }
+
+    const std::string author = read_line("Author keyword (empty for any): ");
+    if (!author.empty()) {
+        filter.author_keyword = author;
+    }
+
+    int year{};
+    std::cout << "Publication year (0 for any): ";
+    if (!read_int(year)) {
+        return;
+    }
+
+    if (year < 0) {
+        std::cout << "Please enter a non-negative year.\n";
+        return;
+    }
+
+    if (year != 0) {
+        filter.publication_year = year;
+    }
+
+    int borrowed_choice{};
+    std::cout << "Borrowed status (-1 for any, 0 for available, 1 for borrowed): ";
+    if (!read_int(borrowed_choice)) {
+        return;
+    }
+
+    if (borrowed_choice == 0 || borrowed_choice == 1) {
+        filter.borrowed = borrowed_choice == 1;
+    } else if (borrowed_choice != -1) {
+        std::cout << "Please enter -1, 0, or 1.\n";
+        return;
+    }
+
+    const auto matches = service.filter_books(filter);
+    std::cout << "Matches: " << matches.size() << "\n";
+
+    for (const auto& book : matches) {
+        print_book(book);
+    }
+}
+
 bool save_library(const library::LibraryService& service, const std::string& file_path) {
     if (library::save_books_to_file(service.all_books(), file_path)) {
         return true;
@@ -465,6 +516,9 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
         break;
     case MenuChoice::list_page:
         list_books_page(service);
+        break;
+    case MenuChoice::filter_books:
+        filter_books_in_library(service);
         break;
     default:
         std::cout << "Unknown choice.\n";
