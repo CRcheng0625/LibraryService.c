@@ -270,3 +270,22 @@ TEST(LibraryServiceTest, FiltersByTitleAndBorrowedStatus) {
     ASSERT_EQ(matches.size(), 1U);
     EXPECT_EQ(matches.front().id, 1);
 }
+
+TEST(LibraryServiceTest, FilterReturnsIndependentCopy) {
+    library::LibraryService service;
+
+    ASSERT_TRUE(service.add_book({1, "C++ Primer", "Author A", 2012, false}));
+
+    library::BookFilter filter;
+    filter.title_keyword = "c++";
+
+    auto matches = service.filter_books(filter);
+
+    ASSERT_EQ(matches.size(), 1U);
+
+    matches.front().title = "Changed Title";
+
+    const auto original = service.find_by_id(1);
+    ASSERT_TRUE(original.has_value());
+    EXPECT_EQ(original->title, "C++ Primer");
+}
