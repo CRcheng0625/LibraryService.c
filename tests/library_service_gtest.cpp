@@ -34,18 +34,18 @@ TEST(LibraryServiceTest, BorrowsAndReturnsBook) {
     library::LibraryService service;
     ASSERT_TRUE(service.add_book({7, "Effective Modern C++", "Scott Meyers", 2014, false}));
 
-    EXPECT_TRUE(service.borrow_book(7));
-    EXPECT_FALSE(service.borrow_book(7));
-    EXPECT_TRUE(service.return_book(7));
+    EXPECT_EQ(service.borrow_book(7), library::LoanResult::success);
+    EXPECT_EQ(service.borrow_book(7), library::LoanResult::already_borrowed);
+    EXPECT_EQ(service.return_book(7), library::LoanResult::success);
 }
 
 TEST(LibraryServiceTest, RejectsInvalidBorrowAndReturnOperations) {
     library::LibraryService service;
     ASSERT_TRUE(service.add_book({7, "Effective Modern C++", "Scott Meyers", 2014, false}));
 
-    EXPECT_FALSE(service.borrow_book(99));
-    EXPECT_FALSE(service.return_book(7));
-    EXPECT_FALSE(service.return_book(99));
+    EXPECT_EQ(service.borrow_book(99), library::LoanResult::book_not_found);
+    EXPECT_EQ(service.return_book(7), library::LoanResult::not_borrowed);
+    EXPECT_EQ(service.return_book(99), library::LoanResult::book_not_found);
 }
 
 TEST(LibraryServiceTest, UpdatesExistingBook) {
@@ -195,7 +195,7 @@ TEST(LibraryServiceTest, RebuildsIndexAfterMiddleRemoval) {
     const auto third = service.find_by_id(3);
     ASSERT_TRUE(third.has_value());
     EXPECT_EQ(third->title, "Third");
-    EXPECT_TRUE(service.borrow_book(3));
+    EXPECT_EQ(service.borrow_book(3), library::LoanResult::success);
 }
 
 TEST(LibraryServiceTest, FiltersByAuthorAndYear) {

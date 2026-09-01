@@ -165,13 +165,27 @@ void update_borrow_status(library::LibraryService& service, bool borrow) {
     if (!read_int(id)) {
         return;
     }
-    bool success{};
+    library::LoanResult result{};
     if (borrow) {
-        success = service.borrow_book(id);
+        result = service.borrow_book(id);
     } else {
-        success = service.return_book(id);
+        result = service.return_book(id);
     }
-    std::cout << (success ? "Done.\n" : "Operation failed.\n");
+
+    switch (result) {
+    case library::LoanResult::success:
+        std::cout << "Done.\n";
+        break;
+    case library::LoanResult::book_not_found:
+        std::cout << "Book not found.\n";
+        break;
+    case library::LoanResult::already_borrowed:
+        std::cout << "Book is already borrowed.\n";
+        break;
+    case library::LoanResult::not_borrowed:
+        std::cout << "Book is not currently borrowed.\n";
+        break;
+    }
 }
 
 void remove_book_from_library(library::LibraryService& service) {

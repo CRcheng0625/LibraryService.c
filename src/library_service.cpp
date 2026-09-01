@@ -50,34 +50,34 @@ bool LibraryService::remove_book(int id) {
     return removed;
 }
 
-bool LibraryService::borrow_book(int id) {
+LoanResult LibraryService::borrow_book(int id) {
     const auto index_it = id_index_.find(id);
     if (index_it == id_index_.end() || index_it->second >= books_.size()) {
-        return false;
+        return LoanResult::book_not_found;
     }
 
     Book& book = books_[index_it->second];
     if (book.borrowed) {
-        return false;
+        return LoanResult::already_borrowed;
     }
 
     book.borrowed = true;
-    return true;
+    return LoanResult::success;
 }
 
-bool LibraryService::return_book(int id) {
+LoanResult LibraryService::return_book(int id) {
     const auto index_it = id_index_.find(id);
     if (index_it == id_index_.end() || index_it->second >= books_.size()) {
-        return false;
+        return LoanResult::book_not_found;
     }
 
     Book& book = books_[index_it->second];
     if (!book.borrowed) {
-        return false;
+        return LoanResult::not_borrowed;
     }
 
     book.borrowed = false;
-    return true;
+    return LoanResult::success;
 }
 
 bool LibraryService::update_book(int id, std::string title, std::string author,
