@@ -115,33 +115,21 @@ std::optional<Book> LibraryService::find_by_id(int id) const {
 }
 
 std::vector<Book> LibraryService::search_by_title(std::string_view keyword) const {
-    const std::string normalized_keyword = to_lower(keyword);
-    std::vector<Book> matches;
-
-    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
-                 [&normalized_keyword](const Book& book) {
-                     return to_lower(book.title).find(normalized_keyword) != std::string::npos;
-                 });
-    return matches;
+    BookFilter filter;
+    filter.title_keyword = std::string(keyword);
+    return filter_books(filter);
 }
 
 std::vector<Book> LibraryService::search_by_author(std::string_view keyword) const {
-    const std::string normalized_keyword = to_lower(keyword);
-    std::vector<Book> matches;
-
-    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
-                 [&normalized_keyword](const Book& book) {
-                     return to_lower(book.author).find(normalized_keyword) != std::string::npos;
-                 });
-
-    return matches;
+    BookFilter filter;
+    filter.author_keyword = std::string(keyword);
+    return filter_books(filter);
 }
 
 std::vector<Book> LibraryService::search_by_year(int year) const {
-    std::vector<Book> matches;
-    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
-                 [year](const Book& book) { return book.publication_year == year; });
-    return matches;
+    BookFilter filter;
+    filter.publication_year = year;
+    return filter_books(filter);
 }
 
 std::vector<Book> LibraryService::books_sorted_by_year() const {
@@ -165,44 +153,31 @@ const std::vector<Book>& LibraryService::all_books() const noexcept {
 }
 
 std::vector<Book> LibraryService::available_books() const {
-    std::vector<Book> result;
-    for (const auto& book : books_) {
-        if (!book.borrowed) {
-            result.push_back(book);
-        }
-    }
-    return result;
+    BookFilter filter;
+    filter.borrowed = false;
+    return filter_books(filter);
 }
 
 std::vector<Book> LibraryService::search_by_author_and_year(std::string_view author,
-                                                            int year) const {
-    const std::string normalized_author = to_lower(author);
-    std::vector<Book> matches;
-    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
-                 [&normalized_author, year](const Book& book) {
-                     return to_lower(book.author).find(normalized_author) != std::string::npos &&
-                            book.publication_year == year;
-                 });
-    return matches;
+    int year) const {
+    BookFilter filter;
+    filter.author_keyword = std::string(author);
+    filter.publication_year = year;
+    return filter_books(filter);
 }
 
 std::vector<Book> LibraryService::search_by_borrowed(bool borrowed) const {
-    std::vector<Book> matches;
-    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
-                 [borrowed](const Book& book) { return book.borrowed == borrowed; });
-    return matches;
+    BookFilter filter;
+    filter.borrowed = borrowed;
+    return filter_books(filter);
 }
 
 std::vector<Book> LibraryService::search_by_author_and_borrowed(std::string_view author,
                                                                 bool borrowed) const {
-    const std::string normalized_author = to_lower(author);
-    std::vector<Book> matches;
-    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
-                 [&normalized_author, borrowed](const Book& book) {
-                     return to_lower(book.author).find(normalized_author) != std::string::npos &&
-                            book.borrowed == borrowed;
-                 });
-    return matches;
+    BookFilter filter;
+    filter.author_keyword = std::string(author);
+    filter.borrowed = borrowed;
+    return filter_books(filter);
 }
 
 BookPage LibraryService::books_page(std::size_t offset, std::size_t limit) const {
