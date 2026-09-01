@@ -264,15 +264,19 @@ void list_books_page(const library::LibraryService& service) {
         return;
     }
 
-    const auto books = service.books_page(offset, limit);
-    if (books.empty()) {
+    const auto page = service.books_page(offset, limit);
+    if (page.books.empty()) {
         std::cout << "No books in this page.\n";
         return;
     }
 
-    std::cout << "Books on this page: " << books.size() << "\n";
-    for (const auto& book : books) {
+    std::cout << "Showing " << page.books.size() << " of " << page.total_books << " books.\n";
+    for (const auto& book : page.books) {
         print_book(book);
+    }
+
+    if (page.has_next) {
+        std::cout << "More books are available.\n";
     }
 }
 

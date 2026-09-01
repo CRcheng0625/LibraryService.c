@@ -2,6 +2,7 @@
 
 #include "library/book.hpp"
 
+#include <cstddef>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -9,6 +10,12 @@
 #include <vector>
 
 namespace library {
+
+struct BookPage {
+    std::vector<Book> books;
+    std::size_t total_books{};
+    bool has_next{};
+};
 
 class LibraryService {
   public:
@@ -28,7 +35,7 @@ class LibraryService {
     [[nodiscard]] std::vector<Book> books_sorted_by_title() const;
     [[nodiscard]] std::vector<Book> books_sorted_by_year() const;
     [[nodiscard]] std::vector<Book> available_books() const;
-    [[nodiscard]] std::vector<Book> books_page(std::size_t offset, std::size_t limit) const;
+    [[nodiscard]] BookPage books_page(std::size_t offset, std::size_t limit) const;
     [[nodiscard]] const std::vector<Book>& all_books() const noexcept;
 
   private:

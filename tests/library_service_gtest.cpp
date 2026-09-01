@@ -152,11 +152,13 @@ TEST(LibraryServiceTest, ReturnsRequestedBookPage) {
     ASSERT_TRUE(service.add_book({2, "Second", "Author B", 2021, false}));
     ASSERT_TRUE(service.add_book({3, "Third", "Author C", 2022, false}));
 
-    const auto page = service.books_page(1, 2);
+    const auto page = service.books_page(0, 2);
 
-    ASSERT_EQ(page.size(), 2U);
-    EXPECT_EQ(page[0].id, 2);
-    EXPECT_EQ(page[1].id, 3);
+    ASSERT_EQ(page.books.size(), 2U);
+    EXPECT_EQ(page.books[0].id, 1);
+    EXPECT_EQ(page.books[1].id, 2);
+    EXPECT_EQ(page.total_books, 3U);
+    EXPECT_TRUE(page.has_next);
 }
 
 TEST(LibraryServiceTest, HandlesBookPageBoundaries) {
@@ -165,12 +167,21 @@ TEST(LibraryServiceTest, HandlesBookPageBoundaries) {
     ASSERT_TRUE(service.add_book({2, "Second", "Author B", 2021, false}));
     ASSERT_TRUE(service.add_book({3, "Third", "Author C", 2022, false}));
 
-    EXPECT_TRUE(service.books_page(3, 1).empty());
-    EXPECT_TRUE(service.books_page(0, 0).empty());
+    const auto out_of_range_page = service.books_page(3, 1);
+    EXPECT_TRUE(out_of_range_page.books.empty());
+    EXPECT_EQ(out_of_range_page.total_books, 3U);
+    EXPECT_FALSE(out_of_range_page.has_next);
+
+    const auto zero_limit_page = service.books_page(0, 0);
+    EXPECT_TRUE(zero_limit_page.books.empty());
+    EXPECT_EQ(zero_limit_page.total_books, 3U);
+    EXPECT_FALSE(zero_limit_page.has_next);
 
     const auto final_page = service.books_page(2, 10);
-    ASSERT_EQ(final_page.size(), 1U);
-    EXPECT_EQ(final_page.front().id, 3);
+    ASSERT_EQ(final_page.books.size(), 1U);
+    EXPECT_EQ(final_page.books.front().id, 3);
+    EXPECT_EQ(final_page.total_books, 3U);
+    EXPECT_FALSE(final_page.has_next);
 }
 
 TEST(LibraryServiceTest, RebuildsIndexAfterMiddleRemoval) {

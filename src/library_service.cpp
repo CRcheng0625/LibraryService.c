@@ -205,15 +205,23 @@ std::vector<Book> LibraryService::search_by_author_and_borrowed(std::string_view
     return matches;
 }
 
-std::vector<Book> LibraryService::books_page(std::size_t offset, std::size_t limit) const {
+BookPage LibraryService::books_page(std::size_t offset, std::size_t limit) const {
+
+    BookPage page;
+    page.total_books = books_.size();
+
     if (offset >= books_.size() || limit == 0) {
-        return {};
+        return page;
     }
 
     const std::size_t available = books_.size() - offset;
     const std::size_t count = std::min(limit, available);
 
-    return std::vector<Book>(books_.begin() + offset, books_.begin() + offset + count);
+    page.books = std::vector<Book>(books_.begin() + offset, books_.begin() + offset + count);
+
+    page.has_next = count < available;
+
+    return page;
 }
 
 } // namespace library
