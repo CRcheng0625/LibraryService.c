@@ -197,3 +197,59 @@ TEST(LibraryServiceTest, RebuildsIndexAfterMiddleRemoval) {
     EXPECT_EQ(third->title, "Third");
     EXPECT_TRUE(service.borrow_book(3));
 }
+
+TEST(LibraryServiceTest, FiltersByAuthorAndYear) {
+    library::LibraryService service;
+
+    ASSERT_TRUE(service.add_book({1, "Clean Code", "Robert Martin", 2008, false}));
+    ASSERT_TRUE(service.add_book({2, "C++ Primer", "Stanley Lippman", 2012, false}));
+    ASSERT_TRUE(service.add_book({3, "Another Book", "Robert Martin", 2012, false}));
+
+    library::BookFilter filter;
+    filter.author_keyword = "martin";
+    filter.publication_year = 2012;
+
+    const auto matches = service.filter_books(filter);
+
+    ASSERT_EQ(matches.size(), 1U);
+    EXPECT_EQ(matches.front().id, 3);
+}
+
+TEST(LibraryServiceTest, FiltersByBorrowedStatus) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "Available Book", "Author A", 2020, false}));
+    ASSERT_TRUE(service.add_book({2, "Borrowed Book", "Author B", 2021, true}));
+
+    library::BookFilter filter;
+    filter.borrowed = false;
+
+    const auto matches = service.filter_books(filter);
+
+    ASSERT_EQ(matches.size(), 1U);
+    EXPECT_EQ(matches.front().id, 1);
+}
+
+TEST(LibraryServiceTest, EmptyFilterReturnsAllBooks) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "First Book", "Author A", 2020, false}));
+    ASSERT_TRUE(service.add_book({2, "Second Book", "Author B", 2021, true}));
+
+    const library::BookFilter filter;
+    const auto matches = service.filter_books(filter);
+
+    ASSERT_EQ(matches.size(), 2U);
+    EXPECT_EQ(matches[0].id, 1);
+    EXPECT_EQ(matches[1].id, 2);
+}
+
+TEST(LibraryServiceTest, FilterReturnsNoMatches) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "First Book", "Author A", 2020, false}));
+
+    library::BookFilter filter;
+    filter.publication_year = 1900;
+
+    const auto matches = service.filter_books(filter);
+
+    EXPECT_TRUE(matches.empty());
+}
