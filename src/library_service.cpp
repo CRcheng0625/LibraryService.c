@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <iterator>
 #include <string>
 #include <unordered_map>
@@ -202,6 +203,17 @@ std::vector<Book> LibraryService::search_by_author_and_borrowed(std::string_view
                             book.borrowed == borrowed;
                  });
     return matches;
+}
+
+std::vector<Book> LibraryService::books_page(std::size_t offset, std::size_t limit) const {
+    if (offset >= books_.size() || limit == 0) {
+        return {};
+    }
+
+    const std::size_t available = books_.size() - offset;
+    const std::size_t count = std::min(limit, available);
+
+    return std::vector<Book>(books_.begin() + offset, books_.begin() + offset + count);
 }
 
 } // namespace library

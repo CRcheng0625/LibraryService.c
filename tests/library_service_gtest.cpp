@@ -146,6 +146,33 @@ TEST(LibraryServiceTest, SortingEmptyLibraryReturnsEmptyVector) {
     EXPECT_TRUE(service.books_sorted_by_title().empty());
 }
 
+TEST(LibraryServiceTest, ReturnsRequestedBookPage) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "First", "Author A", 2020, false}));
+    ASSERT_TRUE(service.add_book({2, "Second", "Author B", 2021, false}));
+    ASSERT_TRUE(service.add_book({3, "Third", "Author C", 2022, false}));
+
+    const auto page = service.books_page(1, 2);
+
+    ASSERT_EQ(page.size(), 2U);
+    EXPECT_EQ(page[0].id, 2);
+    EXPECT_EQ(page[1].id, 3);
+}
+
+TEST(LibraryServiceTest, HandlesBookPageBoundaries) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "First", "Author A", 2020, false}));
+    ASSERT_TRUE(service.add_book({2, "Second", "Author B", 2021, false}));
+    ASSERT_TRUE(service.add_book({3, "Third", "Author C", 2022, false}));
+
+    EXPECT_TRUE(service.books_page(3, 1).empty());
+    EXPECT_TRUE(service.books_page(0, 0).empty());
+
+    const auto final_page = service.books_page(2, 10);
+    ASSERT_EQ(final_page.size(), 1U);
+    EXPECT_EQ(final_page.front().id, 3);
+}
+
 TEST(LibraryServiceTest, RebuildsIndexAfterMiddleRemoval) {
     library::LibraryService service;
     ASSERT_TRUE(service.add_book({1, "First", "Author A", 2020, false}));

@@ -1,6 +1,7 @@
 #include "library/book_storage.hpp"
 #include "library/library_service.hpp"
 
+#include <cstddef>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -25,7 +26,8 @@ enum class MenuChoice : unsigned char {
     search_borrowed = 13,
     search_author_and_borrowed = 14,
     update_book = 15,
-    list_by_title = 16
+    list_by_title = 16,
+    list_page = 17
 };
 
 enum class MenuAction : unsigned char {
@@ -76,6 +78,7 @@ void print_menu() {
               << "14. Search by author and borrowed status\n"
               << "15. Update book\n"
               << "16. List books by title\n"
+              << "17. List books by page\n"
               << "0. Exit\n"
               << "Choose: ";
 }
@@ -229,6 +232,45 @@ void list_books_by_title(const library::LibraryService& service) {
         return;
     }
 
+    for (const auto& book : books) {
+        print_book(book);
+    }
+}
+
+bool read_non_negative_size(const std::string& prompt, std::size_t& value) {
+    int input{};
+    std::cout << prompt;
+
+    if (!read_int(input) || input < 0) {
+        std::cout << "Please enter a non-negative number.\n";
+        return false;
+    }
+
+    value = static_cast<std::size_t>(input);
+    return true;
+}
+
+void list_books_page(const library::LibraryService& service) {
+    std::size_t offset{};
+    std::size_t limit{};
+
+    if (!read_non_negative_size("Offset (0-based): ", offset) ||
+        !read_non_negative_size("Number of books: ", limit)) {
+        return;
+    }
+
+    if (limit == 0) {
+        std::cout << "Number of books must be greater than zero.\n";
+        return;
+    }
+
+    const auto books = service.books_page(offset, limit);
+    if (books.empty()) {
+        std::cout << "No books in this page.\n";
+        return;
+    }
+
+    std::cout << "Books on this page: " << books.size() << "\n";
     for (const auto& book : books) {
         print_book(book);
     }
@@ -416,6 +458,9 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
         break;
     case MenuChoice::list_by_title:
         list_books_by_title(service);
+        break;
+    case MenuChoice::list_page:
+        list_books_page(service);
         break;
     default:
         std::cout << "Unknown choice.\n";
