@@ -193,8 +193,11 @@ BookPage LibraryService::books_page(std::size_t offset, std::size_t limit) const
 
     const std::size_t available = books_.size() - offset;
     const std::size_t count = std::min(limit, available);
+    using DifferenceType = std::vector<Book>::difference_type;
 
-    page.books = std::vector<Book>(books_.begin() + offset, books_.begin() + offset + count);
+    const auto first = books_.begin() + static_cast<DifferenceType>(offset);
+    const auto last = first + static_cast<DifferenceType>(count);
+    page.books = std::vector<Book>(first, last);
 
     page.has_next = count < available;
 
