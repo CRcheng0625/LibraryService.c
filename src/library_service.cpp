@@ -149,6 +149,22 @@ LibraryStats LibraryService::statistics() const {
     return stats;
 }
 
+LibraryStats LibraryService::statistics(const BookFilter& filter) const {
+    LibraryStats stats;
+    const auto matches = filter_books(filter);
+
+    stats.total_count = matches.size();
+
+    for (const Book& book : matches) {
+        if (book.borrowed) {
+            ++stats.borrowed_count;
+        }
+    }
+
+    stats.available_count = stats.total_count - stats.borrowed_count;
+    return stats;
+}
+
 std::vector<Book> LibraryService::books_sorted_by_year() const {
     std::vector<Book> result = books_;
     std::stable_sort(result.begin(), result.end(), [](const Book& left, const Book& right) {
@@ -176,7 +192,7 @@ std::vector<Book> LibraryService::available_books() const {
 }
 
 std::vector<Book> LibraryService::search_by_author_and_year(std::string_view author,
-    int year) const {
+                                                            int year) const {
     BookFilter filter;
     filter.author_keyword = std::string(author);
     filter.publication_year = year;
@@ -233,8 +249,7 @@ std::vector<Book> LibraryService::filter_books(const BookFilter& filter) const {
 
     std::vector<Book> matches;
 
-    std::copy_if(books_.begin(), books_.end(),
-        std::back_inserter(matches),
+    std::copy_if(books_.begin(), books_.end(), std::back_inserter(matches),
                  [&filter, &normalized_title, &normalized_author](const Book& book) {
                      if (normalized_title.has_value() &&
                          to_lower(book.title).find(*normalized_title) == std::string::npos) {
@@ -248,8 +263,7 @@ std::vector<Book> LibraryService::filter_books(const BookFilter& filter) const {
                          book.publication_year != *filter.publication_year) {
                          return false;
                      }
-                     if (filter.borrowed.has_value() &&
-                         book.borrowed != *filter.borrowed) {
+                     if (filter.borrowed.has_value() && book.borrowed != *filter.borrowed) {
                          return false;
                      }
                      return true;

@@ -44,6 +44,7 @@ class LibraryService {
     LoanResult borrow_book(int id);
     LoanResult return_book(int id);
     LibraryStats statistics() const;
+    LibraryStats statistics(const BookFilter& filter) const;
     bool update_book(int id, std::string title, std::string author, int publication_year);
 
     [[nodiscard]] std::optional<Book> find_by_id(int id) const;

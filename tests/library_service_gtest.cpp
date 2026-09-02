@@ -337,3 +337,36 @@ TEST(LibraryServiceTest, StatisticsCountsBorrowedAndAvailableBooks) {
     EXPECT_EQ(stats.borrowed_count, 2U);
     EXPECT_EQ(stats.available_count, 1U);
 }
+
+TEST(LibraryServiceTest, StatisticsRespectsBorrowedFilter) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "Available Book", "Author A", 2020, false}));
+    ASSERT_TRUE(service.add_book({2, "Borrowed Book", "Author B", 2020, true}));
+    ASSERT_TRUE(service.add_book({3, "Another Borrowed Book", "Author C", 2021, true}));
+
+    library::BookFilter filter;
+    filter.borrowed = true;
+
+    const auto stats = service.statistics(filter);
+
+    EXPECT_EQ(stats.total_count, 2U);
+    EXPECT_EQ(stats.borrowed_count, 2U);
+    EXPECT_EQ(stats.available_count, 0U);
+}
+
+TEST(LibraryServiceTest, StatisticsRespectsCombinedFilters) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "Available 2020", "Author A", 2020, false}));
+    ASSERT_TRUE(service.add_book({2, "Borrowed 2020", "Author B", 2020, true}));
+    ASSERT_TRUE(service.add_book({3, "Borrowed 2021", "Author C", 2021, true}));
+
+    library::BookFilter filter;
+    filter.publication_year = 2020;
+    filter.borrowed = true;
+
+    const auto stats = service.statistics(filter);
+
+    EXPECT_EQ(stats.total_count, 1U);
+    EXPECT_EQ(stats.borrowed_count, 1U);
+    EXPECT_EQ(stats.available_count, 0U);
+}
