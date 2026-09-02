@@ -12,16 +12,14 @@ void remove_file(const std::string& file_path) {
     std::remove(file_path.c_str());
 }
 
-}  // namespace
+} // namespace
 
 TEST(BookStorageTest, SavesAndLoadsBooks) {
     const std::string file_path = "storage_gtest_books.txt";
-    const std::vector<library::Book> books{
-        {1, "C++ Primer", "Stanley Lippman", 2012, false},
-        {2, "Clean Code", "Robert C. Martin", 2008, true}};
+    const std::vector<library::Book> books{{1, "C++ Primer", "Stanley Lippman", 2012, false},
+                                           {2, "Clean Code", "Robert C. Martin", 2008, true}};
 
-    ASSERT_EQ(library::save_books_to_file(books, file_path),
-              library::SaveStatus::success);
+    ASSERT_EQ(library::save_books_to_file(books, file_path), library::SaveStatus::success);
 
     const auto result = library::load_books_from_file(file_path);
     remove_file(file_path);
@@ -34,8 +32,7 @@ TEST(BookStorageTest, SavesAndLoadsBooks) {
 }
 
 TEST(BookStorageTest, ReportsMissingFile) {
-    const auto result =
-        library::load_books_from_file("storage_gtest_missing.txt");
+    const auto result = library::load_books_from_file("storage_gtest_missing.txt");
 
     EXPECT_EQ(result.status, library::LoadStatus::file_not_found);
     EXPECT_TRUE(result.books.empty());
@@ -136,8 +133,7 @@ TEST(BookStorageTest, RejectsInvalidBookWhenSaving) {
 
     const std::vector<library::Book> books{{1, "", "Author", 2020, false}};
 
-    EXPECT_EQ(library::save_books_to_file(books, file_path),
-              library::SaveStatus::invalid_book);
+    EXPECT_EQ(library::save_books_to_file(books, file_path), library::SaveStatus::invalid_book);
 
     remove_file(file_path);
 }
@@ -155,8 +151,7 @@ TEST(BookStorageTest, RejectsDuplicateIdsWhenSaving) {
     const std::vector<library::Book> books{{1, "First", "Author A", 2020, false},
                                            {1, "Second", "Author B", 2021, false}};
 
-    EXPECT_EQ(library::save_books_to_file(books, file_path),
-              library::SaveStatus::invalid_book);
+    EXPECT_EQ(library::save_books_to_file(books, file_path), library::SaveStatus::invalid_book);
 
     remove_file(file_path);
 }
@@ -166,13 +161,11 @@ TEST(BookStorageTest, FailedSavePreservesExistingFile) {
 
     const std::vector<library::Book> original{{1, "Original", "Author", 2020, false}};
 
-    ASSERT_EQ(library::save_books_to_file(original, file_path),
-              library::SaveStatus::success);
+    ASSERT_EQ(library::save_books_to_file(original, file_path), library::SaveStatus::success);
 
     const std::vector<library::Book> invalid{{2, "", "Author", 2021, false}};
 
-    EXPECT_EQ(library::save_books_to_file(invalid, file_path),
-              library::SaveStatus::invalid_book);
+    EXPECT_EQ(library::save_books_to_file(invalid, file_path), library::SaveStatus::invalid_book);
 
     const auto loaded = library::load_books_from_file(file_path);
     remove_file(file_path);
