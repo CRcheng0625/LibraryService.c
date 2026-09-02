@@ -26,8 +26,8 @@ struct LoadResult {
     LoadStatus status{LoadStatus::success};
 };
 
-SaveStatus save_books_to_file(const std::vector<Book>& books, const std::string& file_path);
+[[nodiscard]] SaveStatus save_books_to_file(const std::vector<Book>& books, const std::string& file_path);
 
-LoadResult load_books_from_file(const std::string& file_path);
+[[nodiscard]] LoadResult load_books_from_file(const std::string& file_path);
 
 } // namespace library
