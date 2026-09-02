@@ -129,3 +129,19 @@ TEST(BookStorageTest, RejectsEmptyAuthor) {
     EXPECT_EQ(result.status, library::LoadStatus::invalid_format);
     EXPECT_TRUE(result.books.empty());
 }
+
+TEST(BookStorageTest, RejectsInvalidBookWhenSaving) {
+    const std::string file_path = "storage_gtest_invalid_save.txt";
+
+    const std::vector<library::Book> books{{1, "", "Author", 2020, false}};
+
+    EXPECT_FALSE(library::save_books_to_file(books, file_path));
+
+    remove_file(file_path);
+}
+
+TEST(BookStorageTest, ReportsSaveFailureForInvalidPath) {
+    const std::vector<library::Book> books{{1, "Book", "Author", 2020, false}};
+
+    EXPECT_FALSE(library::save_books_to_file(books, "directory_that_does_not_exist/books.txt"));
+}

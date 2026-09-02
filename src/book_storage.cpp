@@ -10,6 +10,11 @@
 namespace library {
 
 bool save_books_to_file(const std::vector<Book>& books, const std::string& file_path) {
+    for (const Book& book : books) {
+        if (!is_valid_book(book)) {
+            return false;
+        }
+    }
 
     std::ofstream output(file_path);
 
