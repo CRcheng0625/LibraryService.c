@@ -302,3 +302,38 @@ TEST(LibraryServiceTest, RejectsUpdateWithInvalidYear) {
     EXPECT_EQ(original->title, "Original");
     EXPECT_EQ(original->publication_year, 2020);
 }
+
+TEST(LibraryServiceTest, StatisticsForEmptyLibraryReturnsZeroCounts) {
+    library::LibraryService service;
+
+    const auto stats = service.statistics();
+
+    EXPECT_EQ(stats.total_count, 0U);
+    EXPECT_EQ(stats.borrowed_count, 0U);
+    EXPECT_EQ(stats.available_count, 0U);
+}
+
+TEST(LibraryServiceTest, StatisticsCountsAvailableBooks) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "Book A", "Author A", 2020, false}));
+    ASSERT_TRUE(service.add_book({2, "Book B", "Author B", 2021, false}));
+
+    const auto stats = service.statistics();
+
+    EXPECT_EQ(stats.total_count, 2U);
+    EXPECT_EQ(stats.borrowed_count, 0U);
+    EXPECT_EQ(stats.available_count, 2U);
+}
+
+TEST(LibraryServiceTest, StatisticsCountsBorrowedAndAvailableBooks) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "Book A", "Author A", 2020, false}));
+    ASSERT_TRUE(service.add_book({2, "Book B", "Author B", 2021, true}));
+    ASSERT_TRUE(service.add_book({3, "Book C", "Author C", 2022, true}));
+
+    const auto stats = service.statistics();
+
+    EXPECT_EQ(stats.total_count, 3U);
+    EXPECT_EQ(stats.borrowed_count, 2U);
+    EXPECT_EQ(stats.available_count, 1U);
+}

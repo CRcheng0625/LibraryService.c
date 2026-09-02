@@ -134,6 +134,21 @@ std::vector<Book> LibraryService::search_by_year(int year) const {
     return filter_books(filter);
 }
 
+LibraryStats LibraryService::statistics() const {
+    LibraryStats stats;
+    stats.total_count = books_.size();
+
+    for (const Book& book : books_) {
+        if (book.borrowed) {
+            ++stats.borrowed_count;
+        }
+    }
+
+    stats.available_count = stats.total_count - stats.borrowed_count;
+
+    return stats;
+}
+
 std::vector<Book> LibraryService::books_sorted_by_year() const {
     std::vector<Book> result = books_;
     std::stable_sort(result.begin(), result.end(), [](const Book& left, const Book& right) {

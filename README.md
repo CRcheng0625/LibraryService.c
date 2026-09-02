@@ -10,10 +10,14 @@
 - 按标题或作者关键词搜索，忽略大小写
 - 按出版年份查询和排序
 - 按作者与出版年份组合查询
+- 使用 `BookFilter` 组合标题、作者、年份和借阅状态筛选
+- 使用 `BookPage` 分页读取图书列表
 - 使用 `unordered_map` 索引加速按 ID 查找
+- 使用 `LoanResult` 和 `SaveStatus` 返回具体的成功或失败原因
 - 启动时从 `books.txt` 读取数据，退出时保存数据
 - 使用 CTest 运行自动化测试
 - 使用 GoogleTest 编写服务层和持久化测试
+- 使用共享的 `book_validation` 模块统一校验图书数据
 - 使用 `.clang-format` 统一 C++ 代码风格
 - 使用 clang-tidy 和 GitHub Actions 做持续检查
 
@@ -26,13 +30,16 @@ my first project/
 ├── include/library/
 │   ├── book.hpp                    # Book 数据类型
 │   ├── book_storage.hpp            # 文件持久化接口
+│   ├── book_validation.hpp         # 图书数据校验接口
 │   └── library_service.hpp         # 图书业务接口
 ├── src/
 │   ├── book_storage.cpp            # 文件读写实现
+│   ├── book_validation.cpp         # 图书数据校验实现
 │   └── library_service.cpp         # 图书业务实现
 ├── tests/
 │   ├── library_service_gtest.cpp   # LibraryService 测试
-│   └── book_storage_gtest.cpp       # 文件持久化测试
+│   ├── book_storage_gtest.cpp       # 文件持久化测试
+│   └── book_validation_gtest.cpp    # 图书校验测试
 ├── docs/
 │   └── learning-roadmap.md         # 学习路线和练习记录
 ├── CMakeLists.txt                  # CMake 构建规则
@@ -44,9 +51,11 @@ my first project/
 ```text
 library_service.cpp ─┐
 book_storage.cpp ────┼──> library_core
+book_validation.cpp ─┘
                      ├──> library_cli
 library_service_gtest ─┐
-book_storage_gtest ────┴──> GoogleTest + CTest
+book_storage_gtest ────┤
+book_validation_gtest ─┴──> GoogleTest + CTest
 ```
 
 业务逻辑位于 `library_core`，命令行程序和测试程序通过 CMake 链接这个库。
@@ -89,7 +98,7 @@ ctest --preset default --output-on-failure
 3. `src/library_service.cpp`：理解查找、筛选、排序和状态修改。
 4. `app/main.cpp`：理解菜单、输入处理和业务调用。
 5. `include/library/book_storage.hpp` 与 `src/book_storage.cpp`：理解文件保存和读取。
-6. `tests/library_service_gtest.cpp` 与 `tests/book_storage_gtest.cpp`：理解 GoogleTest 如何验证行为。
+6. `tests/library_service_gtest.cpp`、`tests/book_storage_gtest.cpp` 与 `tests/book_validation_gtest.cpp`：理解 GoogleTest 如何验证行为。
 7. `docs/learning-roadmap.md`：按练习路线继续扩展。
 
 ## 学习原则
@@ -98,4 +107,4 @@ ctest --preset default --output-on-failure
 
 ## 当前状态
 
-第一阶段学习项目已经完成，主线包含核心图书功能、CMake 模块化、GoogleTest、CTest、Git 工作流、静态检查和文件持久化。下一阶段重点是减少提示，独立完成需求拆解、实现、测试和提交。
+第一阶段学习项目已经完成，主线包含核心图书功能、组合筛选、分页、CMake 模块化、GoogleTest、CTest、Git 工作流、静态检查和文件持久化。下一阶段重点是减少提示，独立完成需求拆解、实现、测试和提交。

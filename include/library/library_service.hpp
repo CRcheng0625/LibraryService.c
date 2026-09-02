@@ -24,6 +24,12 @@ struct BookFilter {
     std::optional<bool> borrowed;
 };
 
+struct LibraryStats {
+    std::size_t total_count{};
+    std::size_t borrowed_count{};
+    std::size_t available_count{};
+};
+
 enum class LoanResult {
     success,
     book_not_found,
@@ -37,6 +43,7 @@ class LibraryService {
     bool remove_book(int id);
     LoanResult borrow_book(int id);
     LoanResult return_book(int id);
+    LibraryStats statistics() const;
     bool update_book(int id, std::string title, std::string author, int publication_year);
 
     [[nodiscard]] std::optional<Book> find_by_id(int id) const;

@@ -27,4 +27,4 @@ jobs:
         run: ctest --preset default
 
       - name: Static analysis
-        run: clang-tidy src/library_service.cpp src/book_storage.cpp app/main.cpp -p=build
+        run: clang-tidy src/library_service.cpp src/book_storage.cpp src/book_validation.cpp app/main.cpp -p=build
