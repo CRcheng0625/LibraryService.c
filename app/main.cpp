@@ -488,42 +488,44 @@ bool load_library(library::LibraryService& service, const std::string& file_path
 }
 
 void show_statistics(const library::LibraryService& service) {
-    int choice{};
+    library::BookFilter filter;
 
+    int year{};
+    std::cout << "Publication year (0 for any): ";
+    if (!read_int(year)) {
+        return;
+    }
+
+    if (year < 0) {
+        std::cout << "Please enter a non-negative year.\n";
+        return;
+    }
+
+    if (year != 0) {
+        filter.publication_year = year;
+    }
+
+    int choice{};
     std::cout << "Statistics mode (0 all, 1 available, 2 borrowed): ";
     if (!read_int(choice)) {
         return;
     }
 
-    library::LibraryStats stats;
-
-    switch (choice) {
-    case 0:
-        stats = service.statistics();
-        break;
-
-    case 1: {
-        library::BookFilter filter;
-        filter.borrowed = false;
-        stats = service.statistics(filter);
-        break;
-    }
-
-    case 2: {
-        library::BookFilter filter;
-        filter.borrowed = true;
-        stats = service.statistics(filter);
-        break;
-    }
-
-    default:
+    if (choice < 0 || choice > 2) {
         std::cout << "Please enter 0, 1, or 2.\n";
         return;
     }
 
-    std::cout << "total_count: " << stats.total_count << std::endl;
-    std::cout << "available_count: " << stats.available_count << std::endl;
-    std::cout << "borrowed_count: " << stats.borrowed_count << std::endl;
+    if (choice != 0) {
+        filter.borrowed = choice == 2;
+    }
+
+    const bool has_filter = year != 0 || choice != 0;
+    const auto stats = has_filter ? service.statistics(filter) : service.statistics();
+
+    std::cout << "total_count: " << stats.total_count << '\n';
+    std::cout << "available_count: " << stats.available_count << '\n';
+    std::cout << "borrowed_count: " << stats.borrowed_count << '\n';
 
 }
 
