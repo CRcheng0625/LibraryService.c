@@ -83,7 +83,8 @@ LoanResult LibraryService::return_book(int id) {
 
 bool LibraryService::update_book(int id, std::string title, std::string author,
                                  int publication_year) {
-    if (title.empty() || author.empty()) {
+    const Book candidate{id, title, author, publication_year, false};
+    if (!is_valid_book(candidate)) {
         return false;
     }
 

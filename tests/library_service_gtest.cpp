@@ -290,3 +290,15 @@ TEST(LibraryServiceTest, FilterReturnsIndependentCopy) {
     ASSERT_TRUE(original.has_value());
     EXPECT_EQ(original->title, "C++ Primer");
 }
+
+TEST(LibraryServiceTest, RejectsUpdateWithInvalidYear) {
+    library::LibraryService service;
+    ASSERT_TRUE(service.add_book({1, "Original", "Author", 2020, false}));
+
+    EXPECT_FALSE(service.update_book(1, "Updated", "Author", 0));
+
+    const auto original = service.find_by_id(1);
+    ASSERT_TRUE(original.has_value());
+    EXPECT_EQ(original->title, "Original");
+    EXPECT_EQ(original->publication_year, 2020);
+}
