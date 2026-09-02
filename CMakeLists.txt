@@ -52,5 +52,9 @@ if(BUILD_TESTING)
     add_executable(book_storage_gtest tests/book_storage_gtest.cpp)
     target_link_libraries(book_storage_gtest PRIVATE library_core GTest::gtest_main)
     gtest_discover_tests(book_storage_gtest)
+
+    add_executable(book_validation_gtest tests/book_validation_gtest.cpp)
+    target_link_libraries(book_validation_gtest PRIVATE library_core GTest::gtest_main)
+    gtest_discover_tests(book_validation_gtest)
 endif()
 
