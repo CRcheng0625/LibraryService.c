@@ -488,7 +488,38 @@ bool load_library(library::LibraryService& service, const std::string& file_path
 }
 
 void show_statistics(const library::LibraryService& service) {
-    const auto stats = service.statistics();
+    int choice{};
+
+    std::cout << "Statistics mode (0 all, 1 available, 2 borrowed): ";
+    if (!read_int(choice)) {
+        return;
+    }
+
+    library::LibraryStats stats;
+
+    switch (choice) {
+    case 0:
+        stats = service.statistics();
+        break;
+
+    case 1: {
+        library::BookFilter filter;
+        filter.borrowed = false;
+        stats = service.statistics(filter);
+        break;
+    }
+
+    case 2: {
+        library::BookFilter filter;
+        filter.borrowed = true;
+        stats = service.statistics(filter);
+        break;
+    }
+
+    default:
+        std::cout << "Please enter 0, 1, or 2.\n";
+        return;
+    }
 
     std::cout << "total_count: " << stats.total_count << std::endl;
     std::cout << "available_count: " << stats.available_count << std::endl;
