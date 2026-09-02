@@ -145,3 +145,14 @@ TEST(BookStorageTest, ReportsSaveFailureForInvalidPath) {
 
     EXPECT_FALSE(library::save_books_to_file(books, "directory_that_does_not_exist/books.txt"));
 }
+
+TEST(BookStorageTest, RejectsDuplicateIdsWhenSaving) {
+    const std::string file_path = "storage_gtest_duplicate_save.txt";
+
+    const std::vector<library::Book> books{{1, "First", "Author A", 2020, false},
+                                           {1, "Second", "Author B", 2021, false}};
+
+    EXPECT_FALSE(library::save_books_to_file(books, file_path));
+
+    remove_file(file_path);
+}
