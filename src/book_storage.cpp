@@ -1,4 +1,5 @@
 #include "library/book_storage.hpp"
+#include "library/book_validation.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -42,7 +43,7 @@ LoadResult load_books_from_file(const std::string& file_path) {
 
     while (input >> book.id >> std::quoted(book.title) >> std::quoted(book.author) >>
            book.publication_year >> book.borrowed) {
-        if (book.id <= 0 || book.title.empty() || book.author.empty()) {
+        if (!is_valid_book(book)) {
             return {{}, LoadStatus::invalid_format};
         }
 
