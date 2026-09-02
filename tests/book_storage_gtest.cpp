@@ -156,3 +156,22 @@ TEST(BookStorageTest, RejectsDuplicateIdsWhenSaving) {
 
     remove_file(file_path);
 }
+
+TEST(BookStorageTest, FailedSavePreservesExistingFile) {
+    const std::string file_path = "storage_gtest_preserve.txt";
+
+    const std::vector<library::Book> original{{1, "Original", "Author", 2020, false}};
+
+    ASSERT_TRUE(library::save_books_to_file(original, file_path));
+
+    const std::vector<library::Book> invalid{{2, "", "Author", 2021, false}};
+
+    EXPECT_FALSE(library::save_books_to_file(invalid, file_path));
+
+    const auto loaded = library::load_books_from_file(file_path);
+    remove_file(file_path);
+
+    ASSERT_EQ(loaded.status, library::LoadStatus::success);
+    ASSERT_EQ(loaded.books.size(), 1U);
+    EXPECT_EQ(loaded.books.front().title, "Original");
+}
