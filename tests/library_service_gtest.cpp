@@ -27,6 +27,7 @@ TEST(LibraryServiceTest, RejectsInvalidBookData) {
     EXPECT_FALSE(service.add_book({0, "Invalid id", "Author", 2020, false}));
     EXPECT_FALSE(service.add_book({-1, "Negative id", "Author", 2020, false}));
     EXPECT_FALSE(service.add_book({2, "", "Author", 2020, false}));
+    EXPECT_FALSE(service.add_book({3, "Valid Title", "", 2020, false}));
     EXPECT_TRUE(service.all_books().empty());
 }
 

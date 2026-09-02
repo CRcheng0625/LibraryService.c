@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <unordered_set>
 #include <utility>
 
 namespace library {
@@ -36,10 +37,19 @@ LoadResult load_books_from_file(const std::string& file_path) {
     }
 
     std::vector<Book> books;
+    std::unordered_set<int> seen_ids;
     Book book;
 
     while (input >> book.id >> std::quoted(book.title) >> std::quoted(book.author) >>
            book.publication_year >> book.borrowed) {
+        if (book.id <= 0 || book.title.empty() || book.author.empty()) {
+            return {{}, LoadStatus::invalid_format};
+        }
+
+        if (!seen_ids.insert(book.id).second) {
+            return {{}, LoadStatus::invalid_format};
+        }
+
         books.push_back(book);
     }
 

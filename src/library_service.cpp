@@ -29,7 +29,8 @@ void LibraryService::rebuild_index() {
 }
 
 bool LibraryService::add_book(Book book) {
-    if (book.id <= 0 || book.title.empty() || id_index_.find(book.id) != id_index_.end()) {
+    if (book.id <= 0 || book.title.empty() || book.author.empty() ||
+        id_index_.find(book.id) != id_index_.end()) {
         return false;
     }
 

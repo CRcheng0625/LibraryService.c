@@ -68,3 +68,64 @@ TEST(BookStorageTest, EmptyFileIsSuccessful) {
     EXPECT_EQ(result.status, library::LoadStatus::success);
     EXPECT_TRUE(result.books.empty());
 }
+
+TEST(BookStorageTest, RejectsDuplicateIds) {
+    const std::string file_path = "storage_gtest_duplicate_ids.txt";
+    {
+        std::ofstream output(file_path);
+        ASSERT_TRUE(output.is_open());
+        output << "1 \"First\" \"Author A\" 2020 0\n";
+        output << "1 \"Second\" \"Author B\" 2021 0\n";
+    }
+
+    const auto result = library::load_books_from_file(file_path);
+    remove_file(file_path);
+
+    EXPECT_EQ(result.status, library::LoadStatus::invalid_format);
+    EXPECT_TRUE(result.books.empty());
+}
+
+TEST(BookStorageTest, RejectsNonPositiveIds) {
+    const std::string file_path = "storage_gtest_invalid_id.txt";
+    {
+        std::ofstream output(file_path);
+        ASSERT_TRUE(output.is_open());
+        output << "0 \"Book\" \"Author\" 2020 0\n";
+    }
+
+    const auto result = library::load_books_from_file(file_path);
+    remove_file(file_path);
+
+    EXPECT_EQ(result.status, library::LoadStatus::invalid_format);
+    EXPECT_TRUE(result.books.empty());
+}
+
+TEST(BookStorageTest, RejectsEmptyTitle) {
+    const std::string file_path = "storage_gtest_empty_title.txt";
+    {
+        std::ofstream output(file_path);
+        ASSERT_TRUE(output.is_open());
+        output << "1 \"\" \"Author\" 2020 0\n";
+    }
+
+    const auto result = library::load_books_from_file(file_path);
+    remove_file(file_path);
+
+    EXPECT_EQ(result.status, library::LoadStatus::invalid_format);
+    EXPECT_TRUE(result.books.empty());
+}
+
+TEST(BookStorageTest, RejectsEmptyAuthor) {
+    const std::string file_path = "storage_gtest_empty_author.txt";
+    {
+        std::ofstream output(file_path);
+        ASSERT_TRUE(output.is_open());
+        output << "1 \"Book\" \"\" 2020 0\n";
+    }
+
+    const auto result = library::load_books_from_file(file_path);
+    remove_file(file_path);
+
+    EXPECT_EQ(result.status, library::LoadStatus::invalid_format);
+    EXPECT_TRUE(result.books.empty());
+}
