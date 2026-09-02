@@ -28,7 +28,8 @@ enum class MenuChoice : unsigned char {
     update_book = 15,
     list_by_title = 16,
     list_page = 17,
-    filter_books = 18
+    filter_books = 18,
+    show_statistics = 19
 };
 
 enum class MenuAction : unsigned char {
@@ -81,6 +82,7 @@ void print_menu() {
               << "16. List books by title\n"
               << "17. List books by page\n"
               << "18. Filter books\n"
+              << "19. Show statistics\n"
               << "0. Exit\n"
               << "Choose: ";
 }
@@ -485,6 +487,15 @@ bool load_library(library::LibraryService& service, const std::string& file_path
     }
 }
 
+void show_statistics(const library::LibraryService& service) {
+    const auto stats = service.statistics();
+
+    std::cout << "total_count: " << stats.total_count << std::endl;
+    std::cout << "available_count: " << stats.available_count << std::endl;
+    std::cout << "borrowed_count: " << stats.borrowed_count << std::endl;
+
+}
+
 MenuAction handle_menu_choice(int choice, library::LibraryService& service,
                               const std::string& file_path) {
     switch (static_cast<MenuChoice>(choice)) {
@@ -544,6 +555,9 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
         break;
     case MenuChoice::filter_books:
         filter_books_in_library(service);
+        break;
+    case MenuChoice::show_statistics:
+        show_statistics(service);
         break;
     default:
         std::cout << "Unknown choice.\n";
