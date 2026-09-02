@@ -7,6 +7,13 @@
 
 namespace library {
 
+enum class SaveStatus {
+    success,
+    invalid_book,
+    open_error,
+    write_error
+};
+
 enum class LoadStatus {
     success,
     file_not_found,
@@ -19,7 +26,7 @@ struct LoadResult {
     LoadStatus status{LoadStatus::success};
 };
 
-bool save_books_to_file(const std::vector<Book>& books, const std::string& file_path);
+SaveStatus save_books_to_file(const std::vector<Book>& books, const std::string& file_path);
 
 LoadResult load_books_from_file(const std::string& file_path);
 

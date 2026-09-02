@@ -443,11 +443,22 @@ void filter_books_in_library(const library::LibraryService& service) {
 }
 
 bool save_library(const library::LibraryService& service, const std::string& file_path) {
-    if (library::save_books_to_file(service.all_books(), file_path)) {
+    const auto status = library::save_books_to_file(service.all_books(), file_path);
+
+    switch (status) {
+    case library::SaveStatus::success:
         return true;
+    case library::SaveStatus::invalid_book:
+        std::cerr << "Cannot save invalid book data.\n";
+        break;
+    case library::SaveStatus::open_error:
+        std::cerr << "Failed to open books file for saving.\n";
+        break;
+    case library::SaveStatus::write_error:
+        std::cerr << "Failed while writing books file.\n";
+        break;
     }
 
-    std::cerr << "Failed to save books.\n";
     return false;
 }
 

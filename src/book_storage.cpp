@@ -9,19 +9,19 @@
 
 namespace library {
 
-bool save_books_to_file(const std::vector<Book>& books, const std::string& file_path) {
+SaveStatus save_books_to_file(const std::vector<Book>& books, const std::string& file_path) {
     std::unordered_set<int> seen_ids;
 
     for (const Book& book : books) {
         if (!is_valid_book(book) || !seen_ids.insert(book.id).second) {
-            return false;
+            return SaveStatus::invalid_book;
         }
     }
 
     std::ofstream output(file_path);
 
     if (!output) {
-        return false;
+        return SaveStatus::open_error;
     }
 
     for (const Book& book : books) {
@@ -29,7 +29,7 @@ bool save_books_to_file(const std::vector<Book>& books, const std::string& file_
                << ' ' << book.publication_year << ' ' << book.borrowed << '\n';
     }
 
-    return static_cast<bool>(output);
+    return output ? SaveStatus::success : SaveStatus::write_error;
 }
 
 LoadResult load_books_from_file(const std::string& file_path) {
