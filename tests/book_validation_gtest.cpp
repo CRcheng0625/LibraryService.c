@@ -14,4 +14,8 @@ TEST(BookValidationTest, RejectsInvalidBookFields) {
     EXPECT_FALSE(library::is_valid_book({1, "", "Author", 2020, false}));
 
     EXPECT_FALSE(library::is_valid_book({1, "Book", "", 2020, false}));
+
+    EXPECT_FALSE(library::is_valid_book({1, "Book", "Author", 0, false}));
+
+    EXPECT_FALSE(library::is_valid_book({1, "Book", "Author", -1, false}));
 }
