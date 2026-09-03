@@ -475,9 +475,10 @@ bool load_library(library::LibraryService& service, const std::string& file_path
         for (const auto& book : result.books) {
             service.add_book(book);
         }
+        std::cout << "Loaded " << result.books.size() << " book(s).\n";
         return true;
     case library::LoadStatus::file_not_found:
-        std::cout << "Books file nort found. Stating with an empty library.\n";
+        std::cout << "Books file not found. Starting with an empty library.\n";
         return true;
     case library::LoadStatus::open_error:
         std::cerr << "Failed to open books file.\n";
@@ -626,8 +627,12 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 
 } // namespace
 
-int main() { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
-    const std::string file_path = "books.txt";
+int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
+    if (argc > 2) {
+        std::cerr << "Usage: library_cli [books_file]\n";
+        return 1;
+    }
+    const std::string file_path = argc == 2 ? argv[1] : "books.txt";
     library::LibraryService service;
 
     if (!load_library(service, file_path)) {
