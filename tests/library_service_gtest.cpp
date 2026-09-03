@@ -370,3 +370,37 @@ TEST(LibraryServiceTest, StatisticsRespectsCombinedFilters) {
     EXPECT_EQ(stats.borrowed_count, 1U);
     EXPECT_EQ(stats.available_count, 0U);
 }
+
+TEST(LibraryServiceTest, StatisticsRespectsTitleFilter) {
+    library::LibraryService service;
+
+    ASSERT_TRUE(service.add_book({1, "C++ Primer", "Author A", 2012, false}));
+    ASSERT_TRUE(service.add_book({2, "Clean Code", "Author B", 2008, true}));
+
+    library::BookFilter filter;
+    filter.title_keyword = "c++";
+
+    const auto stats = service.statistics(filter);
+
+    EXPECT_EQ(stats.total_count, 1U);
+    EXPECT_EQ(stats.available_count, 1U);
+    EXPECT_EQ(stats.borrowed_count, 0U);
+}
+
+TEST(LibraryServiceTest, StatisticsRespectsAuthorFilter) {
+    library::LibraryService service;
+
+    ASSERT_TRUE(service.add_book(
+        {1, "C++ Primer", "Stanley Lippman", 2012, false}));
+    ASSERT_TRUE(service.add_book(
+        {2, "Clean Code", "Robert C. Martin", 2008, true}));
+
+    library::BookFilter filter;
+    filter.author_keyword = "martin";
+
+    const auto stats = service.statistics(filter);
+
+    EXPECT_EQ(stats.total_count, 1U);
+    EXPECT_EQ(stats.available_count, 0U);
+    EXPECT_EQ(stats.borrowed_count, 1U);
+}
