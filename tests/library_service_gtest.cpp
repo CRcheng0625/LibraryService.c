@@ -390,10 +390,8 @@ TEST(LibraryServiceTest, StatisticsRespectsTitleFilter) {
 TEST(LibraryServiceTest, StatisticsRespectsAuthorFilter) {
     library::LibraryService service;
 
-    ASSERT_TRUE(service.add_book(
-        {1, "C++ Primer", "Stanley Lippman", 2012, false}));
-    ASSERT_TRUE(service.add_book(
-        {2, "Clean Code", "Robert C. Martin", 2008, true}));
+    ASSERT_TRUE(service.add_book({1, "C++ Primer", "Stanley Lippman", 2012, false}));
+    ASSERT_TRUE(service.add_book({2, "Clean Code", "Robert C. Martin", 2008, true}));
 
     library::BookFilter filter;
     filter.author_keyword = "martin";
