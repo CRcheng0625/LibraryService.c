@@ -490,6 +490,10 @@ bool load_library(library::LibraryService& service, const std::string& file_path
 void show_statistics(const library::LibraryService& service) {
     library::BookFilter filter;
 
+    const std::string title = read_line("Title keyword (empty for any): ");
+    if (!title.empty()) {
+        filter.title_keyword = title;
+    }
     int year{};
     std::cout << "Publication year (0 for any): ";
     if (!read_int(year)) {
@@ -520,7 +524,7 @@ void show_statistics(const library::LibraryService& service) {
         filter.borrowed = choice == 2;
     }
 
-    const bool has_filter = year != 0 || choice != 0;
+    const bool has_filter = !title.empty() || year != 0 || choice != 0;
     const auto stats = has_filter ? service.statistics(filter) : service.statistics();
 
     std::cout << "total_count: " << stats.total_count << '\n';
