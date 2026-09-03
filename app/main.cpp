@@ -30,7 +30,8 @@ enum class MenuChoice : unsigned char {
     list_by_title = 16,
     list_page = 17,
     filter_books = 18,
-    show_statistics = 19
+    show_statistics = 19,
+    save_now = 20
 };
 
 enum class MenuAction : unsigned char {
@@ -84,6 +85,7 @@ void print_menu() {
               << "17. List books by page\n"
               << "18. Filter books\n"
               << "19. Show statistics\n"
+              << "20. Save now\n"
               << "0. Exit\n"
               << "Choose: ";
 }
@@ -607,6 +609,11 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
         break;
     case MenuChoice::show_statistics:
         show_statistics(service);
+        break;
+    case MenuChoice::save_now:
+        if (save_library(service, file_path)) {
+            std::cout << "Books saved.\n";
+        }
         break;
     default:
         std::cout << "Unknown choice.\n";
