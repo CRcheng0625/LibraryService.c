@@ -477,6 +477,7 @@ bool load_library(library::LibraryService& service, const std::string& file_path
         }
         return true;
     case library::LoadStatus::file_not_found:
+        std::cout << "Books file nort found. Stating with an empty library.\n";
         return true;
     case library::LoadStatus::open_error:
         std::cerr << "Failed to open books file.\n";
