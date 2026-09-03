@@ -64,6 +64,10 @@ std::string read_line(const std::string& prompt) {
     return line;
 }
 
+void print_usage() {
+    std::cout << "Usage: library_cli [books_file]\n";
+    std::cout << "       library_cli --help\n";
+}
 void print_menu() {
     std::cout << "\nLibrary manager\n"
               << "1. List books\n"
@@ -628,8 +632,12 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 } // namespace
 
 int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
+    if (argc == 2 && std::string(argv[1]) == "--help") {
+        print_usage();
+        return 0;
+    }
     if (argc > 2) {
-        std::cerr << "Usage: library_cli [books_file]\n";
+        print_usage();
         return 1;
     }
     const std::string file_path = argc == 2 ? argv[1] : "books.txt";
