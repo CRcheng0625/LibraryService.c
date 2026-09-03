@@ -495,7 +495,7 @@ void show_statistics(const library::LibraryService& service) {
         filter.title_keyword = title;
     }
 
-    const std::string author = read_line("Author keyword Z(empty for any");
+    const std::string author = read_line("Author keyword (empty for any): ");
     if (!author.empty()) {
         filter.author_keyword = author;
     }
