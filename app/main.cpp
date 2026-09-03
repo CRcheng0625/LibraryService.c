@@ -6,6 +6,7 @@
 #include <limits>
 #include <string>
 #include <utility>
+#include <iomanip>
 
 namespace {
 
@@ -537,6 +538,9 @@ void show_statistics(const library::LibraryService& service) {
     std::cout << "available_count: " << stats.available_count << '\n';
     std::cout << "borrowed_count: " << stats.borrowed_count << '\n';
 
+    const double borrowed_rate =
+        stats.total_count == 0 ? 0.0 : 100.0 * stats.borrowed_count / stats.total_count;
+    std::cout << std::fixed << std::setprecision(1) << "borrowed_rate: " << borrowed_rate << "%\n";
 }
 
 MenuAction handle_menu_choice(int choice, library::LibraryService& service,
