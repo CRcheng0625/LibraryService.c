@@ -494,6 +494,12 @@ void show_statistics(const library::LibraryService& service) {
     if (!title.empty()) {
         filter.title_keyword = title;
     }
+
+    const std::string author = read_line("Author keyword Z(empty for any");
+    if (!author.empty()) {
+        filter.author_keyword = author;
+    }
+
     int year{};
     std::cout << "Publication year (0 for any): ";
     if (!read_int(year)) {
@@ -524,7 +530,7 @@ void show_statistics(const library::LibraryService& service) {
         filter.borrowed = choice == 2;
     }
 
-    const bool has_filter = !title.empty() || year != 0 || choice != 0;
+    const bool has_filter = !title.empty() || !author.empty() || year != 0 || choice != 0;
     const auto stats = has_filter ? service.statistics(filter) : service.statistics();
 
     std::cout << "total_count: " << stats.total_count << '\n';
