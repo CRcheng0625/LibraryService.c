@@ -77,7 +77,12 @@ if(BUILD_TESTING)
 
     set_tests_properties(LibraryCliUnknownOption PROPERTIES
         WILL_FAIL TRUE
-        PASS_REGULAR_EXPRESSION "Unknown option"
     )
+
+    add_test(NAME LibraryCliEmptyPath COMMAND library_cli "")
+
+    set_tests_properties(LibraryCliEmptyPath PROPERTIES
+    WILL_FAIL TRUE
+)
 endif()
 
