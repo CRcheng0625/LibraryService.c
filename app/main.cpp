@@ -67,8 +67,8 @@ std::string read_line(const std::string& prompt) {
 
 void print_usage(std::string_view program_name) {
     std::cout << "Usage: " << program_name << " [books_file]\n";
-    std::cout << "       " << program_name << " --help\n";
-    std::cout << "       " << program_name << " --version\n";
+    std::cout << "       " << program_name << " -h\n";
+    std::cout << "       " << program_name << " -v\n";
 }
 
 void print_version(std::string_view program_name) {
@@ -639,11 +639,11 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 
 int main(int argc,
          char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
-    if (argc == 2 && std::string(argv[1]) == "--help") {
+    if (argc == 2 && std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h") {
         print_usage(argv[0]);
         return 0;
     }
-    if (argc == 2 && std::string(argv[1]) == "--version") {
+    if (argc == 2 && std::string(argv[1]) == "--version" || std::string(argv[1]) == "-v") {
         print_version(argv[0]);
         return 0;
     }

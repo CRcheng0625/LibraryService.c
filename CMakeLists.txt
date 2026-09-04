@@ -93,5 +93,16 @@ if(BUILD_TESTING)
         WILL_FAIL TRUE
     )
     
+    add_test(NAME LibraryCliShortHelp COMMAND library_cli -h)
+
+    set_tests_properties(LibraryCliShortHelp PROPERTIES
+        PASS_REGULAR_EXPRESSION "Usage:"
+    )
+
+    add_test(NAME LibraryCliShortVersion COMMAND library_cli -v)
+
+    set_tests_properties(LibraryCliShortVersion PROPERTIES
+        PASS_REGULAR_EXPRESSION "version"
+    )
 endif()
 
