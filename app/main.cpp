@@ -663,7 +663,7 @@ int main(int argc,
         print_usage(argv[0]);
         return 1;
     }
-    const std::string file_path = argc == 2 ? argv[1] : "books.txt";
+    const std::string file_path = option.empty() ? "books.txt" : std::string(option);
     library::LibraryService service;
 
     if (!load_library(service, file_path)) {
