@@ -65,6 +65,19 @@ if(BUILD_TESTING)
 
     set_tests_properties(LibraryCliVersion PROPERTIES
     PASS_REGULAR_EXPRESSION "version"
-)
+    )
+
+    add_test(NAME LibraryCliHelp COMMAND library_cli --help)
+
+    set_tests_properties(LibraryCliHelp PROPERTIES
+        PASS_REGULAR_EXPRESSION "Usage:"
+    )
+
+    add_test(NAME LibraryCliUnknownOption COMMAND library_cli --unknown)
+
+    set_tests_properties(LibraryCliUnknownOption PROPERTIES
+        WILL_FAIL TRUE
+        PASS_REGULAR_EXPRESSION "Unknown option"
+    )
 endif()
 
