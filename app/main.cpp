@@ -72,7 +72,7 @@ void print_usage(std::string_view program_name) {
 }
 
 void print_version(std::string_view program_name) {
-    std::cout << program_name << " version 0.1.0\n";
+    std::cout << program_name << " version " << LIBRARY_CLI_VERSION << std::endl;
 }
 void print_menu() {
     std::cout << "\nLibrary manager\n"

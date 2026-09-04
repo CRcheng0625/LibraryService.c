@@ -24,6 +24,9 @@ else()
 endif()
 
 add_executable(library_cli app/main.cpp)
+target_compile_definitions(library_cli PRIVATE
+    LIBRARY_CLI_VERSION="${PROJECT_VERSION}"
+
 target_link_libraries(library_cli PRIVATE library_core)
 
 add_executable(lookup_benchmark tools/lookup_benchmark.cpp)
