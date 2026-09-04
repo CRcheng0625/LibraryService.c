@@ -644,6 +644,7 @@ int main(int argc,
         return 1;
     }
     if (argc > 2) {
+        std::cerr << "Too many command line arguments.\n";
         print_usage(argv[0]);
         return 1;
     }
