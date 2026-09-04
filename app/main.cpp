@@ -41,6 +41,11 @@ enum class MenuAction : unsigned char {
     exit_failure
 };
 
+enum class StartupAction {
+    run,
+    exit_success,
+    exit_failure
+};
 bool read_int(int& value) {
     if (std::cin >> value) {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -635,35 +640,53 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
     return MenuAction::continue_running;
 }
 
-} // namespace
-
-int main(int argc,
-         char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
+StartupAction parse_command_line(int argc, char* argv[], std::string& file_path) {
     const std::string_view option = argc == 2 ? argv[1] : "";
+
     if (argc == 2 && (option == "--help" || option == "-h")) {
         print_usage(argv[0]);
-        return 0;
+        return StartupAction::exit_success;
     }
+
     if (argc == 2 && (option == "--version" || option == "-v")) {
         print_version(argv[0]);
-        return 0;
+        return StartupAction::exit_success;
     }
+
     if (argc == 2 && option.empty()) {
         std::cerr << "Books file path cannot be empty.\n";
         print_usage(argv[0]);
-        return 1;
+        return StartupAction::exit_failure;
     }
+
     if (argc == 2 && option.compare(0, 2, "--") == 0) {
         std::cerr << "Unknown option: " << option << '\n';
         print_usage(argv[0]);
-        return 1;
+        return StartupAction::exit_failure;
     }
+
     if (argc > 2) {
         std::cerr << "Too many command line arguments.\n";
         print_usage(argv[0]);
+        return StartupAction::exit_failure;
+    }
+
+    file_path = option.empty() ? "books.txt" : std::string(option);
+    return StartupAction::run;
+}
+
+} // namespace
+
+int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
+    std::string file_path;
+    const StartupAction startup = parse_command_line(argc, argv, file_path);
+    if (startup == StartupAction::exit_success) {
+        return 0;
+    }
+    if (startup == StartupAction::exit_failure) {
         return 1;
     }
-    const std::string file_path = option.empty() ? "books.txt" : std::string(option);
+
     library::LibraryService service;
 
     if (!load_library(service, file_path)) {
