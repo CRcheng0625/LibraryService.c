@@ -60,5 +60,11 @@ if(BUILD_TESTING)
     add_executable(book_validation_gtest tests/book_validation_gtest.cpp)
     target_link_libraries(book_validation_gtest PRIVATE library_core GTest::gtest_main)
     gtest_discover_tests(book_validation_gtest)
+
+    add_test(NAME LibraryCliVersion COMMAND library_cli --version)
+
+    set_tests_properties(LibraryCliVersion PROPERTIES
+    PASS_REGULAR_EXPRESSION "version"
+)
 endif()
 
