@@ -654,7 +654,7 @@ int main(int argc,
         return 1;
     }
     if (argc == 2 && option.compare(0, 2, "--") == 0) {
-        std::cerr << "Unknown option: " << argv[1] << '\n';
+        std::cerr << "Unknown option: " << option << '\n';
         print_usage(argv[0]);
         return 1;
     }
