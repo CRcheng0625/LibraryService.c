@@ -639,22 +639,21 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 
 int main(int argc,
          char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
-    if (argc == 2 &&
-        (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h")) {
+    const std::string_view option = argc == 2 ? argv[1] : "";
+    if (argc == 2 && (option == "--help" || option == "-h")) {
         print_usage(argv[0]);
         return 0;
     }
-    if (argc == 2 &&
-        (std::string(argv[1]) == "--version" || std::string(argv[1]) == "-v")) {
+    if (argc == 2 && (option == "--version" || option == "-v")) {
         print_version(argv[0]);
         return 0;
     }
-    if (argc == 2 && std::string(argv[1]).empty()) {
+    if (argc == 2 && option.empty()) {
         std::cerr << "Books file path cannot be empty.\n";
         print_usage(argv[0]);
         return 1;
     }
-    if (argc == 2 && std::string(argv[1]).compare(0, 2, "--") == 0) {
+    if (argc == 2 && option.compare(0, 2, "--") == 0) {
         std::cerr << "Unknown option: " << argv[1] << '\n';
         print_usage(argv[0]);
         return 1;
