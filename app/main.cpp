@@ -647,6 +647,11 @@ int main(int argc,
         print_version(argv[0]);
         return 0;
     }
+    if (argc == 2 && std::string(argv[1]).empty()) {
+        std::cerr << "Books file path cannot be empty.\n";
+        print_usage(argv[0]);
+        return 1;
+    }
     if (argc == 2 && std::string(argv[1]).compare(0, 2, "--") == 0) {
         std::cerr << "Unknown option: " << argv[1] << '\n';
         print_usage(argv[0]);
