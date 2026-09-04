@@ -6,8 +6,8 @@
 #include <iostream>
 #include <limits>
 #include <string>
-#include <utility>
 #include <string_view>
+#include <utility>
 
 namespace {
 
@@ -66,8 +66,8 @@ std::string read_line(const std::string& prompt) {
 }
 
 void print_usage(std::string_view program_name) {
-    std::cout << "Usage: " << program_name << " [books_file]\n ";
-    std::cout << "       " << program_name << " --help\n ";
+    std::cout << "Usage: " << program_name << " [books_file]\n";
+    std::cout << "       " << program_name << " --help\n";
 }
 void print_menu() {
     std::cout << "\nLibrary manager\n"
@@ -547,10 +547,10 @@ void show_statistics(const library::LibraryService& service) {
     std::cout << "available_count: " << stats.available_count << '\n';
     std::cout << "borrowed_count: " << stats.borrowed_count << '\n';
 
-    const double borrowed_rate =
-        stats.total_count == 0
-        ? 0.0
-        : 100.0 * static_cast<double>(stats.borrowed_count) / static_cast<double>(stats.total_count);
+    const double borrowed_rate = stats.total_count == 0
+                                     ? 0.0
+                                     : 100.0 * static_cast<double>(stats.borrowed_count) /
+                                           static_cast<double>(stats.total_count);
     std::cout << std::fixed << std::setprecision(1) << "borrowed_rate: " << borrowed_rate << "%\n";
 }
 
@@ -632,7 +632,8 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 
 } // namespace
 
-int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
+int main(int argc,
+         char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
     if (argc == 2 && std::string(argv[1]) == "--help") {
         print_usage(argv[0]);
         return 0;
