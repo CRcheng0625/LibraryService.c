@@ -637,6 +637,11 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
         print_usage(argv[0]);
         return 0;
     }
+    if (argc == 2 && std::string(argv[1]).compare(0, 2, "--") == 0) {
+        std::cerr << "Unknown option: " << argv[1] << '\n';
+        print_usage(argv[0]);
+        return 1;
+    }
     if (argc > 2) {
         print_usage(argv[0]);
         return 1;
