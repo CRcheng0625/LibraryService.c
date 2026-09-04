@@ -83,6 +83,15 @@ if(BUILD_TESTING)
 
     set_tests_properties(LibraryCliEmptyPath PROPERTIES
     WILL_FAIL TRUE
-)
+    )
+    add_test(
+    NAME LibraryCliTooManyArguments
+    COMMAND library_cli first.txt second.txt
+    )
+
+    set_tests_properties(LibraryCliTooManyArguments PROPERTIES
+        WILL_FAIL TRUE
+    )
+    
 endif()
 
