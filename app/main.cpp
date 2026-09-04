@@ -639,11 +639,13 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 
 int main(int argc,
          char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
-    if (argc == 2 && std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h") {
+    if (argc == 2 &&
+        (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h")) {
         print_usage(argv[0]);
         return 0;
     }
-    if (argc == 2 && std::string(argv[1]) == "--version" || std::string(argv[1]) == "-v") {
+    if (argc == 2 &&
+        (std::string(argv[1]) == "--version" || std::string(argv[1]) == "-v")) {
         print_version(argv[0]);
         return 0;
     }
