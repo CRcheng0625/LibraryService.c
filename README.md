@@ -1,4 +1,4 @@
-# My First C++ Project
+# My First C++ Project--图书管理系统
 
 这是一个用于学习现代 C++ 和基础工程实践的命令行图书管理项目。项目从一个简单的 `vector<Book>` 开始，逐步加入业务类、STL 算法、CMake、单元测试、调试、Git 工作流和文件持久化。
 
