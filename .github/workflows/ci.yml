@@ -26,5 +26,14 @@ jobs:
       - name: Test
         run: ctest --preset default --output-on-failure
 
+      - name: Package
+        run: cpack --config build/CPackConfig.cmake
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: first-cpp-project-package
+          path: build/*.zip
+
       - name: Static analysis
         run: clang-tidy src/library_service.cpp src/book_storage.cpp src/book_validation.cpp app/main.cpp app/cli_option.cpp app/library_io.cpp -p=build

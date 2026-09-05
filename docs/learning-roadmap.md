@@ -109,8 +109,9 @@
 - 修复迭代器偏移的有符号/无符号转换警告
 - 用 GitHub Actions 自动构建和运行测试
 - 为 README 增加构建状态和使用说明
+- 使用 CMake `install(...)` 和 CPack 生成可交付 ZIP 包
 
-练习 1 至 4 已完成。练习 5 的本地格式化、clang-tidy 和 GitHub Actions 已接入，下一步重点是持续维护 CI 和编写独立功能。
+练习 1 至 4 已完成。练习 5 的本地格式化、clang-tidy、GitHub Actions 和 CPack 打包已接入，下一步重点是持续维护 CI 和编写独立功能。
 
 ## 实习生水平检查表
 
