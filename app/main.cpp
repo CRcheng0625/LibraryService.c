@@ -74,7 +74,7 @@ std::string read_line(const std::string& prompt) {
 void print_usage(std::string_view program_name) {
     std::cout << "Usage: " << program_name << " [books_file]\n";
     std::cout << "       " << program_name << " -h\n";
-    std::cout << "       " << program_name << " --v\n";
+    std::cout << "       " << program_name << " -v\n";
     std::cout << "       " << program_name << " --check\n";
 }
 
@@ -514,7 +514,7 @@ bool check_library_file(const std::string& file_path) {
 
     switch (result.status) {
     case library::LoadStatus::success:
-        std::cout << "Book filoe is vaild. Loaded " << result.books.size() << " Book(s).\n";
+        std::cout << "Book file is valid. Loaded " << result.books.size() << " book(s).\n";
         return true;
     case library::LoadStatus::file_not_found:
         std::cerr << "Books file was not found.\n";
