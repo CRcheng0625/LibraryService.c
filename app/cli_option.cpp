@@ -12,6 +12,7 @@ void print_usage(std::string_view program_name) {
     std::cout << "       " << program_name << " -h\n";
     std::cout << "       " << program_name << " -v\n";
     std::cout << "       " << program_name << " --check [books_file]\n";
+    std::cout << "       " << program_name << " --list [books_file]\n";
 }
 
 void print_version(std::string_view program_name) {
@@ -45,6 +46,19 @@ StartupAction parse_command_line(int argc, char* argv[], std::string& file_path)
         }
 
         return StartupAction::check;
+    }
+
+    if (option == "--list") {
+        if (argc == 2) {
+            file_path = "books.txt";
+        } else if (argc == 3) {
+            file_path = argv[2];
+        } else {
+            std::cerr << "Too many command line arguments.\n";
+            print_usage(argv[0]);
+            return StartupAction::exit_failure;
+        }
+        return StartupAction::list;
     }
 
     if (argc == 2 && option.empty()) {

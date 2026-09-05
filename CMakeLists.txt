@@ -181,5 +181,28 @@ set_tests_properties(
     PROPERTIES
         WILL_FAIL TRUE
 )
+
+add_test(
+    NAME LibraryCliListCustomFile
+    COMMAND library_cli --list custom_books.txt
+)
+
+set_tests_properties(
+    LibraryCliListCustomFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "Custom File Book"
+)
+
+add_test(
+    NAME LibraryCliListTooManyArguments
+    COMMAND library_cli --list first.txt second.txt
+)
+
+set_tests_properties(
+    LibraryCliListTooManyArguments
+    PROPERTIES
+        WILL_FAIL TRUE
+)
 endif()
 

@@ -143,6 +143,14 @@ GitHub Actions 会在 Linux 和 Windows 两个平台分别构建、测试并上�
 .\build\library_cli.exe --check tests\data\custom_books.txt
 ```
 
+非交互列出图书：
+
+```powershell
+.\build\library_cli.exe --list tests\data\custom_books.txt
+```
+
+`--list` 会读取指定文件并打印全部图书，然后直接退出，不进入交互菜单；省略文件路径时使用默认的 `books.txt`。
+
 数据文件格式：
 
 ```text

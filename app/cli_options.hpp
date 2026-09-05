@@ -7,6 +7,7 @@ namespace cli {
 enum class StartupAction {
     run,
     check,
+    list,
     exit_success,
     exit_failure
 };

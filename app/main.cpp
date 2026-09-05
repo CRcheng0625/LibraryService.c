@@ -598,6 +598,14 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
         }
         return 1;
     }
+    if (startup == cli::StartupAction::list) {
+        library::LibraryService service;
+        if (!library_io::load_library(service, file_path)) {
+            return 1;
+        }
+        list_books(service);
+        return 0;
+    }
     library::LibraryService service;
 
     if (!library_io::load_library(service, file_path)) {
