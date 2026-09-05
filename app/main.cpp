@@ -43,6 +43,7 @@ enum class MenuAction : unsigned char {
 
 enum class StartupAction {
     run,
+    check,
     exit_success,
     exit_failure
 };
@@ -73,7 +74,7 @@ std::string read_line(const std::string& prompt) {
 void print_usage(std::string_view program_name) {
     std::cout << "Usage: " << program_name << " [books_file]\n";
     std::cout << "       " << program_name << " -h\n";
-    std::cout << "       " << program_name << " -v\n";
+    std::cout << "       " << program_name << " -check\n";
 }
 
 void print_version(std::string_view program_name) {
@@ -507,6 +508,28 @@ bool load_library(library::LibraryService& service, const std::string& file_path
     }
 }
 
+bool check_library_file(const std::string& file_path) {
+    const auto result = library::load_books_from_file(file_path);
+
+    switch (result.status) {
+    case library::LoadStatus::success:
+        std::cout << "Book filoe is vaild. Loaded " << result.books.size() << " Book(s).\n";
+        return true;
+    case library::LoadStatus::file_not_found:
+        std::cerr << "Books file was not found.\n";
+        return false;
+
+    case library::LoadStatus::open_error:
+        std::cerr << "Books file could not be opened.\n";
+        return false;
+
+    case library::LoadStatus::invalid_format:
+        std::cerr << "Books file has invalid format.\n";
+        return false;
+    }
+    return false;
+}
+
 void show_statistics(const library::LibraryService& service) {
     library::BookFilter filter;
 
@@ -653,6 +676,10 @@ StartupAction parse_command_line(int argc, char* argv[], std::string& file_path)
         return StartupAction::exit_success;
     }
 
+    if (argc == 2 && (option == "--version" || option == "-v")) {
+        print_version(argv[0]);
+        return StartupAction::exit_success;
+    }
     if (argc == 2 && option.empty()) {
         std::cerr << "Books file path cannot be empty.\n";
         print_usage(argv[0]);
@@ -686,7 +713,12 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
     if (startup == StartupAction::exit_failure) {
         return 1;
     }
-
+    if (startup == StartupAction::check) {
+        if (check_library_file(file_path)) {
+            return 0;
+        }
+        return 1;
+    }
     library::LibraryService service;
 
     if (!load_library(service, file_path)) {
