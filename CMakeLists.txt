@@ -138,7 +138,18 @@ set_tests_properties(
     LibraryCliCheckCustomFile
     PROPERTIES
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
-        PASS_REGULAR_EXPRESSION "Books file is valid"
+        PASS_REGULAR_EXPRESSION "Loaded 1 book"
+)
+
+add_test(
+    NAME LibraryCliCheckTooManyArguments
+    COMMAND library_cli --check first.txt second.txt
+)
+
+set_tests_properties(
+    LibraryCliCheckTooManyArguments
+    PROPERTIES
+        WILL_FAIL TRUE
 )
 endif()
 
