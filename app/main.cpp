@@ -1,12 +1,12 @@
 #include "library/book_storage.hpp"
 #include "library/library_service.hpp"
+#include "cli_options.hpp"
 
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>
-#include <string_view>
 #include <utility>
 
 namespace {
@@ -41,12 +41,6 @@ enum class MenuAction : unsigned char {
     exit_failure
 };
 
-enum class StartupAction {
-    run,
-    check,
-    exit_success,
-    exit_failure
-};
 bool read_int(int& value) {
     if (std::cin >> value) {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -71,16 +65,6 @@ std::string read_line(const std::string& prompt) {
     return line;
 }
 
-void print_usage(std::string_view program_name) {
-    std::cout << "Usage: " << program_name << " [books_file]\n";
-    std::cout << "       " << program_name << " -h\n";
-    std::cout << "       " << program_name << " -v\n";
-    std::cout << "       " << program_name << " --check [books_file]\n";
-}
-
-void print_version(std::string_view program_name) {
-    std::cout << program_name << " version " << LIBRARY_CLI_VERSION << std::endl;
-}
 void print_menu() {
     std::cout << "\nLibrary manager\n"
               << "1. List books\n"
@@ -664,67 +648,18 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
     return MenuAction::continue_running;
 }
 
-StartupAction parse_command_line(int argc, char* argv[], std::string& file_path) {
-    const std::string_view option = argc >= 2 ? argv[1] : "";
-
-    if (argc == 2 && (option == "--help" || option == "-h")) {
-        print_usage(argv[0]);
-        return StartupAction::exit_success;
-    }
-
-    if (argc == 2 && (option == "--version" || option == "-v")) {
-        print_version(argv[0]);
-        return StartupAction::exit_success;
-    }
-
-    if (option == "--check") {
-        if (argc == 2) {
-            file_path = "books.txt";
-        } else if (argc == 3) {
-            file_path = argv[2];
-        } else {
-            std::cerr << "Too many command line arguments.\n";
-            print_usage(argv[0]);
-            return StartupAction::exit_failure;
-        }
-
-        return StartupAction::check;
-    }
-
-    if (argc == 2 && option.empty()) {
-        std::cerr << "Books file path cannot be empty.\n";
-        print_usage(argv[0]);
-        return StartupAction::exit_failure;
-    }
-
-    if (argc == 2 && option.compare(0, 2, "--") == 0) {
-        std::cerr << "Unknown option: " << option << '\n';
-        print_usage(argv[0]);
-        return StartupAction::exit_failure;
-    }
-
-    if (argc > 2) {
-        std::cerr << "Too many command line arguments.\n";
-        print_usage(argv[0]);
-        return StartupAction::exit_failure;
-    }
-
-    file_path = option.empty() ? "books.txt" : std::string(option);
-    return StartupAction::run;
-}
-
 } // namespace
 
 int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
     std::string file_path;
-    const StartupAction startup = parse_command_line(argc, argv, file_path);
-    if (startup == StartupAction::exit_success) {
+    const cli::StartupAction startup = cli::parse_command_line(argc, argv, file_path);
+    if (startup == cli::StartupAction::exit_success) {
         return 0;
     }
-    if (startup == StartupAction::exit_failure) {
+    if (startup == cli::StartupAction::exit_failure) {
         return 1;
     }
-    if (startup == StartupAction::check) {
+    if (startup == cli::StartupAction::check) {
         if (check_library_file(file_path)) {
             return 0;
         }

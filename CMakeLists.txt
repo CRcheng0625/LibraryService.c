@@ -23,7 +23,12 @@ else()
     target_compile_options(library_core PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-add_executable(library_cli app/main.cpp)
+add_executable(
+    library_cli
+    app/main.cpp
+    app/cli_option.cpp
+)
+
 target_compile_definitions(library_cli PRIVATE
     LIBRARY_CLI_VERSION="${PROJECT_VERSION}"
 )
