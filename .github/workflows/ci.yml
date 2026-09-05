@@ -8,14 +8,25 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Check out source
         uses: actions/checkout@v4
 
       - name: Install build tools
+        if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install -y cmake ninja-build g++ clang-tidy
+
+      - name: Set up MSVC
+        if: matrix.os == 'windows-latest'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
 
       - name: Configure
         run: cmake --preset default
@@ -32,8 +43,9 @@ jobs:
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
-          name: first-cpp-project-package
+          name: first-cpp-project-package-${{ matrix.os }}
           path: build/*.zip
 
       - name: Static analysis
+        if: matrix.os == 'ubuntu-latest'
         run: clang-tidy src/library_service.cpp src/book_storage.cpp src/book_validation.cpp app/main.cpp app/cli_option.cpp app/library_io.cpp -p=build

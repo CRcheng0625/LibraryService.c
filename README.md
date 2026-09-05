@@ -112,7 +112,9 @@ cmake --install build --prefix install
 cpack --config build/CPackConfig.cmake
 ```
 
-打包文件会生成在 `build/first_cpp_project-0.1.0-windows.zip`。
+打包文件会生成在 `build/first_cpp_project-0.1.0.zip`。
+
+GitHub Actions 会在 Linux 和 Windows 两个平台分别构建、测试并上传 ZIP artifact。
 
 项目根目录的 `.clang-format` 定义了统一格式。Visual Studio 安装 clang-format 后，可以对当前文件执行格式化；格式化属于代码风格调整，不改变业务逻辑。
 
