@@ -1,6 +1,6 @@
-#include "library/book_storage.hpp"
 #include "library/library_service.hpp"
 #include "cli_options.hpp"
+#include "library_io.hpp"
 
 #include <cstddef>
 #include <iomanip>
@@ -448,73 +448,6 @@ void filter_books_in_library(const library::LibraryService& service) {
     }
 }
 
-bool save_library(const library::LibraryService& service, const std::string& file_path) {
-    const auto status = library::save_books_to_file(service.all_books(), file_path);
-
-    switch (status) {
-    case library::SaveStatus::success:
-        return true;
-    case library::SaveStatus::invalid_book:
-        std::cerr << "Cannot save invalid book data.\n";
-        break;
-    case library::SaveStatus::open_error:
-        std::cerr << "Failed to open books file for saving.\n";
-        break;
-    case library::SaveStatus::write_error:
-        std::cerr << "Failed while writing books file.\n";
-        break;
-    }
-
-    return false;
-}
-
-bool load_library(library::LibraryService& service, const std::string& file_path) {
-    const auto result = library::load_books_from_file(file_path);
-
-    switch (result.status) {
-    case library::LoadStatus::success:
-        for (const auto& book : result.books) {
-            service.add_book(book);
-        }
-        std::cout << "Loaded " << result.books.size() << " book(s).\n";
-        return true;
-    case library::LoadStatus::file_not_found:
-        std::cout << "Books file not found. Starting with an empty library.\n";
-        return true;
-    case library::LoadStatus::open_error:
-        std::cerr << "Failed to open books file.\n";
-        return false;
-    case library::LoadStatus::invalid_format:
-        std::cerr << "Books file has invalid format.\n";
-        return false;
-    default:
-        std::cerr << "Unknown books loading error.\n";
-        return false;
-    }
-}
-
-bool check_library_file(const std::string& file_path) {
-    const auto result = library::load_books_from_file(file_path);
-
-    switch (result.status) {
-    case library::LoadStatus::success:
-        std::cout << "Books file is valid. Loaded " << result.books.size() << " book(s).\n";
-        return true;
-    case library::LoadStatus::file_not_found:
-        std::cerr << "Books file was not found.\n";
-        return false;
-
-    case library::LoadStatus::open_error:
-        std::cerr << "Books file could not be opened.\n";
-        return false;
-
-    case library::LoadStatus::invalid_format:
-        std::cerr << "Books file has invalid format.\n";
-        return false;
-    }
-    return false;
-}
-
 void show_statistics(const library::LibraryService& service) {
     library::BookFilter filter;
 
@@ -576,7 +509,7 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
                               const std::string& file_path) {
     switch (static_cast<MenuChoice>(choice)) {
     case MenuChoice::exit:
-        return save_library(service, file_path) ? MenuAction::exit_success
+        return library_io::save_library(service, file_path) ? MenuAction::exit_success
                                                 : MenuAction::exit_failure;
     case MenuChoice::list_books:
         list_books(service);
@@ -636,7 +569,7 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
         show_statistics(service);
         break;
     case MenuChoice::save_now:
-        if (save_library(service, file_path)) {
+        if (library_io::save_library(service, file_path)) {
             std::cout << "Books saved.\n";
         }
         break;
@@ -660,14 +593,14 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
         return 1;
     }
     if (startup == cli::StartupAction::check) {
-        if (check_library_file(file_path)) {
+        if (library_io::check_library_file(file_path)) {
             return 0;
         }
         return 1;
     }
     library::LibraryService service;
 
-    if (!load_library(service, file_path)) {
+    if (!library_io::load_library(service, file_path)) {
         return 1;
     }
 
@@ -676,7 +609,7 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
         int choice{};
         if (!read_int(choice)) {
             if (std::cin.eof()) {
-                return save_library(service, file_path) ? 0 : 1;
+                return library_io::save_library(service, file_path) ? 0 : 1;
             }
 
             continue;

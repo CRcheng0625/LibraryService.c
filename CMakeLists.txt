@@ -27,6 +27,7 @@ add_executable(
     library_cli
     app/main.cpp
     app/cli_option.cpp
+    app/library_io.cpp
 )
 
 target_compile_definitions(library_cli PRIVATE
