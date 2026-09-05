@@ -600,7 +600,7 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
     }
     if (startup == cli::StartupAction::list) {
         library::LibraryService service;
-        if (!library_io::load_library(service, file_path)) {
+        if (!library_io::load_library(service, file_path, false)) {
             return 1;
         }
         list_books(service);

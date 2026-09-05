@@ -97,6 +97,14 @@ ctest --preset default --output-on-failure
 ctest --test-dir build --output-on-failure
 ```
 
+只运行命令行测试：
+
+```powershell
+ctest --test-dir build --label-regex "^cli$" --output-on-failure
+```
+
+测试标签只用于筛选，不会改变测试行为。
+
 安装可交付文件到单独目录：
 
 ```powershell

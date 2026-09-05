@@ -192,6 +192,7 @@ set_tests_properties(
     PROPERTIES
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
         PASS_REGULAR_EXPRESSION "Custom File Book"
+        FAIL_REGULAR_EXPRESSION "Loaded [0-9]+ book"
 )
 
 add_test(
@@ -204,5 +205,75 @@ set_tests_properties(
     PROPERTIES
         WILL_FAIL TRUE
 )
+
+add_test(
+    NAME LibraryCliListDefaultFile
+    COMMAND library_cli --list
+)
+
+set_tests_properties(
+    LibraryCliListDefaultFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "Test Book"
+)
+
+add_test(
+    NAME LibraryCliListMissingFile
+    COMMAND library_cli --list missing_books.txt
+)
+
+set_tests_properties(
+    LibraryCliListMissingFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "No books yet"
+)
+
+add_test(
+    NAME LibraryCliListInvalidFile
+    COMMAND library_cli --list
+)
+
+set_tests_properties(
+    LibraryCliListInvalidFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data/invalid"
+        WILL_FAIL TRUE
+)
+
+add_test(
+    NAME LibraryCliListInvalidFileOutput
+    COMMAND
+        ${CMAKE_COMMAND}
+        -DCLI_EXECUTABLE=$<TARGET_FILE:library_cli>
+        "-DWORKING_DIRECTORY=${CMAKE_CURRENT_SOURCE_DIR}/tests/data/invalid"
+        "-DEXPECTED_OUTPUT=Books file has invalid format"
+        -DEXPECTED_EXIT_CODE=1
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_cli_output.cmake"
+)
+
+set_property(
+    TEST
+        LibraryCliVersion
+        LibraryCliHelp
+        LibraryCliUnknownOption
+        LibraryCliEmptyPath
+        LibraryCliTooManyArguments
+        LibraryCliShortHelp
+        LibraryCliShortVersion
+        LibraryCliCheckValidFile
+        LibraryCliCheckInvalidFile
+        LibraryCliCheckCustomFile
+        LibraryCliCheckTooManyArguments
+        LibraryCliListCustomFile
+        LibraryCliListTooManyArguments
+        LibraryCliListDefaultFile
+        LibraryCliListMissingFile
+        LibraryCliListInvalidFile
+        LibraryCliListInvalidFileOutput
+    PROPERTY LABELS cli
+)
+
 endif()
 

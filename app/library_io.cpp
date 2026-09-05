@@ -29,7 +29,7 @@ bool save_library(const library::LibraryService& service, const std::string& fil
     return false;
 }
 
-bool load_library(library::LibraryService& service, const std::string& file_path) {
+bool load_library(library::LibraryService& service, const std::string& file_path, bool show_status) {
     const auto result = library::load_books_from_file(file_path);
 
     switch (result.status) {
@@ -37,13 +37,16 @@ bool load_library(library::LibraryService& service, const std::string& file_path
         for (const auto& book : result.books) {
             service.add_book(book);
         }
-
-        std::cout << "Loaded " << result.books.size() << " book(s).\n";
+        if (show_status) {
+            std::cout << "Loaded " << result.books.size() << " book(s).\n";
+        }
         return true;
 
     case library::LoadStatus::file_not_found:
-        std::cout << "Books file not found. "
-                     "Starting with an empty library.\n";
+        if (show_status) {
+            std::cout << "Books file not found. "
+                         "Starting with an empty library.\n";
+        }
         return true;
 
     case library::LoadStatus::open_error:

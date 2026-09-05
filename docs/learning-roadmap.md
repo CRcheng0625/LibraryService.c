@@ -111,6 +111,9 @@
 - 为 README 增加构建状态和使用说明
 - 使用 CMake `install(...)` 和 CPack 生成可交付 ZIP 包
 - 让 GitHub Actions 在 Linux 和 Windows 上分别构建、测试和打包
+- 增加 `--list [books_file]` 非交互命令及默认路径、缺失文件测试
+- 使用 CTest 标签按功能筛选命令行测试
+- 使用 CMake 脚本同时验证外部程序的输出文字和退出码
 
 练习 1 至 4 已完成。练习 5 的本地格式化、clang-tidy、跨平台 GitHub Actions 和 CPack 打包已接入，下一步重点是持续维护 CI 和编写独立功能。
 
