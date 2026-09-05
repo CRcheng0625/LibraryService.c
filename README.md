@@ -97,6 +97,15 @@ ctest --preset default --output-on-failure
 ctest --test-dir build --output-on-failure
 ```
 
+安装可交付文件到单独目录：
+
+```powershell
+cmake --install build --prefix install
+```
+
+安装后，运行程序位于 `install/bin/library_cli.exe`，示例数据位于
+`install/share/first_cpp_project/books.txt`。GoogleTest 只用于开发和测试，不会被安装。
+
 项目根目录的 `.clang-format` 定义了统一格式。Visual Studio 安装 clang-format 后，可以对当前文件执行格式化；格式化属于代码风格调整，不改变业务逻辑。
 
 运行命令行程序：

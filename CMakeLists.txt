@@ -39,10 +39,26 @@ target_link_libraries(library_cli PRIVATE library_core)
 add_executable(lookup_benchmark tools/lookup_benchmark.cpp)
 target_link_libraries(lookup_benchmark PRIVATE library_core)
 
+include(GNUInstallDirs)
+
+install(
+    TARGETS library_cli
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(
+    FILES tests/data/books.txt
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/first_cpp_project
+)
+
 include(CTest)
 
 if(BUILD_TESTING)
     include(FetchContent)
+
+    # GoogleTest is needed to build tests, but is not part of the application package.
+    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+    set(INSTALL_GMOCK OFF CACHE BOOL "" FORCE)
 
     FetchContent_Declare(
         googletest
