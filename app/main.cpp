@@ -74,6 +74,7 @@ std::string read_line(const std::string& prompt) {
 void print_usage(std::string_view program_name) {
     std::cout << "Usage: " << program_name << " [books_file]\n";
     std::cout << "       " << program_name << " -h\n";
+    std::cout << "       " << program_name << " --v\n";
     std::cout << "       " << program_name << " --check\n";
 }
 
@@ -676,9 +677,9 @@ StartupAction parse_command_line(int argc, char* argv[], std::string& file_path)
         return StartupAction::exit_success;
     }
 
-    if (argc == 2 && (option == "--version" || option == "-v")) {
-        print_version(argv[0]);
-        return StartupAction::exit_success;
+    if (argc == 2 && option == "--check") {
+        file_path = "books.txt";
+        return StartupAction::check;
     }
     if (argc == 2 && option.empty()) {
         std::cerr << "Books file path cannot be empty.\n";

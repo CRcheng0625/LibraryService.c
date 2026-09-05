@@ -104,5 +104,17 @@ if(BUILD_TESTING)
     set_tests_properties(LibraryCliShortVersion PROPERTIES
         PASS_REGULAR_EXPRESSION "version"
     )
+
+    add_test(
+        NAME LibraryCliCheckValidFile
+        COMMAND library_cli --check
+    )
+
+    set_tests_properties(
+        LibraryCliCheckValidFile
+        PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "Books file is valid"
+)
 endif()
 
