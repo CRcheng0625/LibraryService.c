@@ -24,7 +24,7 @@ jobs:
         run: cmake --build --preset default
 
       - name: Test
-        run: ctest --preset default
+        run: ctest --preset default --output-on-failure
 
       - name: Static analysis
-        run: clang-tidy src/library_service.cpp src/book_storage.cpp src/book_validation.cpp app/main.cpp -p=build
+        run: clang-tidy src/library_service.cpp src/book_storage.cpp src/book_validation.cpp app/main.cpp app/cli_option.cpp app/library_io.cpp -p=build

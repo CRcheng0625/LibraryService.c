@@ -26,7 +26,11 @@
 ```text
 my first project/
 ├── app/
-│   └── main.cpp                    # 命令行界面和程序入口
+│   ├── main.cpp                    # 菜单、输入处理和程序入口
+│   ├── cli_option.cpp              # 命令行参数实现
+│   ├── cli_options.hpp             # 命令行参数声明
+│   ├── library_io.cpp              # 文件保存、加载和检查实现
+│   └── library_io.hpp              # 文件操作声明
 ├── include/library/
 │   ├── book.hpp                    # Book 数据类型
 │   ├── book_storage.hpp            # 文件持久化接口
@@ -38,8 +42,12 @@ my first project/
 │   └── library_service.cpp         # 图书业务实现
 ├── tests/
 │   ├── library_service_gtest.cpp   # LibraryService 测试
-│   ├── book_storage_gtest.cpp       # 文件持久化测试
-│   └── book_validation_gtest.cpp    # 图书校验测试
+│   ├── book_storage_gtest.cpp      # 文件持久化测试
+│   ├── book_validation_gtest.cpp   # 图书校验测试
+│   └── data/                       # CLI 测试使用的固定数据文件
+│       ├── books.txt
+│       ├── custom_books.txt
+│       └── invalid/books.txt
 ├── docs/
 │   └── learning-roadmap.md         # 学习路线和练习记录
 ├── CMakeLists.txt                  # CMake 构建规则
@@ -50,9 +58,11 @@ my first project/
 
 ```text
 library_service.cpp ─┐
-book_storage.cpp ────┼──> library_core
-book_validation.cpp ─┘
-                     ├──> library_cli
+book_storage.cpp ────┼──> library_core ───> library_cli
+book_validation.cpp ─┘                         ▲
+                                               │
+                         cli_option.cpp ───────┤
+                         library_io.cpp ────────┘
 library_service_gtest ─┐
 book_storage_gtest ────┤
 book_validation_gtest ─┴──> GoogleTest + CTest
@@ -81,6 +91,12 @@ cmake --build --preset default
 ctest --preset default --output-on-failure
 ```
 
+也可以直接使用 CTest 的构建目录：
+
+```powershell
+ctest --test-dir build --output-on-failure
+```
+
 项目根目录的 `.clang-format` 定义了统一格式。Visual Studio 安装 clang-format 后，可以对当前文件执行格式化；格式化属于代码风格调整，不改变业务逻辑。
 
 运行命令行程序：
@@ -89,7 +105,39 @@ ctest --preset default --output-on-failure
 .\build\library_cli.exe
 ```
 
-程序运行时生成的 `books.txt` 位于当前工作目录，通常是 `build/books.txt`。它是运行时数据，不应提交到 Git。
+查看帮助和版本：
+
+```powershell
+.\build\library_cli.exe --help
+.\build\library_cli.exe --version
+```
+
+检查默认数据文件：
+
+```powershell
+.\build\library_cli.exe --check
+```
+
+检查指定数据文件：
+
+```powershell
+.\build\library_cli.exe --check tests\data\custom_books.txt
+```
+
+数据文件格式：
+
+```text
+id "title" "author" publication_year borrowed
+```
+
+例如：
+
+```text
+1 "C++ Primer" "Stanley Lippman" 2012 0
+2 "Clean Code" "Robert C. Martin" 2008 1
+```
+
+其中 `0` 表示未借出，`1` 表示已借出。`tests/data/` 中的文件只用于自动测试；程序运行时生成的 `books.txt` 通常位于 `build/`，不会提交到 Git。
 
 ## 推荐阅读顺序
 
@@ -97,9 +145,11 @@ ctest --preset default --output-on-failure
 2. `include/library/library_service.hpp`：理解业务类提供的接口。
 3. `src/library_service.cpp`：理解查找、筛选、排序和状态修改。
 4. `app/main.cpp`：理解菜单、输入处理和业务调用。
-5. `include/library/book_storage.hpp` 与 `src/book_storage.cpp`：理解文件保存和读取。
-6. `tests/library_service_gtest.cpp`、`tests/book_storage_gtest.cpp` 与 `tests/book_validation_gtest.cpp`：理解 GoogleTest 如何验证行为。
-7. `docs/learning-roadmap.md`：按练习路线继续扩展。
+5. `app/cli_options.hpp` 与 `app/cli_option.cpp`：理解命令行参数解析。
+6. `app/library_io.hpp` 与 `app/library_io.cpp`：理解应用层如何调用文件持久化接口。
+7. `include/library/book_storage.hpp` 与 `src/book_storage.cpp`：理解文件保存和读取。
+8. `tests/library_service_gtest.cpp`、`tests/book_storage_gtest.cpp` 与 `tests/book_validation_gtest.cpp`：理解 GoogleTest 如何验证行为。
+9. `docs/learning-roadmap.md`：按练习路线继续扩展。
 
 ## 学习原则
 
