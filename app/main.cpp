@@ -514,7 +514,7 @@ bool check_library_file(const std::string& file_path) {
 
     switch (result.status) {
     case library::LoadStatus::success:
-        std::cout << "Book file is valid. Loaded " << result.books.size() << " book(s).\n";
+        std::cout << "Books file is valid. Loaded " << result.books.size() << " book(s).\n";
         return true;
     case library::LoadStatus::file_not_found:
         std::cerr << "Books file was not found.\n";
