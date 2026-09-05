@@ -75,7 +75,7 @@ void print_usage(std::string_view program_name) {
     std::cout << "Usage: " << program_name << " [books_file]\n";
     std::cout << "       " << program_name << " -h\n";
     std::cout << "       " << program_name << " -v\n";
-    std::cout << "       " << program_name << " --check\n";
+    std::cout << "       " << program_name << " --check [books_file]\n";
 }
 
 void print_version(std::string_view program_name) {
@@ -665,7 +665,7 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 }
 
 StartupAction parse_command_line(int argc, char* argv[], std::string& file_path) {
-    const std::string_view option = argc == 2 ? argv[1] : "";
+    const std::string_view option = argc >= 2 ? argv[1] : "";
 
     if (argc == 2 && (option == "--help" || option == "-h")) {
         print_usage(argv[0]);
@@ -677,10 +677,20 @@ StartupAction parse_command_line(int argc, char* argv[], std::string& file_path)
         return StartupAction::exit_success;
     }
 
-    if (argc == 2 && option == "--check") {
-        file_path = "books.txt";
+    if (option == "--check") {
+        if (argc == 2) {
+            file_path = "books.txt";
+        } else if (argc == 3) {
+            file_path = argv[2];
+        } else {
+            std::cerr << "Too many command line arguments.\n";
+            print_usage(argv[0]);
+            return StartupAction::exit_failure;
+        }
+
         return StartupAction::check;
     }
+
     if (argc == 2 && option.empty()) {
         std::cerr << "Books file path cannot be empty.\n";
         print_usage(argv[0]);

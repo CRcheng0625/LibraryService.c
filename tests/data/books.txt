@@ -1,0 +1,2 @@
+1 "Test Book" "Test Author" 2024 0
+2 "Borrowed Book" "Second Author" 2023 1

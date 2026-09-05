@@ -116,7 +116,8 @@ if(BUILD_TESTING)
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
         PASS_REGULAR_EXPRESSION "Books file is valid"
      )
-     add_test(
+
+add_test(
     NAME LibraryCliCheckInvalidFile
     COMMAND library_cli --check
 )
@@ -126,6 +127,18 @@ set_tests_properties(
     PROPERTIES
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data/invalid"
         WILL_FAIL TRUE
+)
+
+add_test(
+    NAME LibraryCliCheckCustomFile
+    COMMAND library_cli --check custom_books.txt
+)
+
+set_tests_properties(
+    LibraryCliCheckCustomFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "Books file is valid"
 )
 endif()
 

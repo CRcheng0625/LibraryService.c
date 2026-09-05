@@ -1,5 +1,9 @@
 build/
 books.txt
+!tests/data/
+!tests/data/books.txt
+!tests/data/invalid/
+!tests/data/invalid/books.txt
 out/
 .vs/
 .vscode/
