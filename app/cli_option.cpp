@@ -19,6 +19,18 @@ void print_version(std::string_view program_name) {
     std::cout << program_name << " version " << LIBRARY_CLI_VERSION << std::endl;
 }
 
+bool parse_optional_file_path(int argc, char* argv[], std::string& file_path) {
+    if (argc == 2) {
+        file_path = "books.txt";
+        return true;
+    }
+    if (argc == 3) {
+        file_path = argv[2];
+        return true;
+    }
+    return false;
+}
+
 } // namespace
 
 StartupAction parse_command_line(int argc, char* argv[], std::string& file_path) {
@@ -34,29 +46,14 @@ StartupAction parse_command_line(int argc, char* argv[], std::string& file_path)
         return StartupAction::exit_success;
     }
 
-    if (option == "--check") {
-        if (argc == 2) {
-            file_path = "books.txt";
-        } else if (argc == 3) {
-            file_path = argv[2];
-        } else {
+    if (option == "--check" || option == "--list") {
+        if (!parse_optional_file_path(argc, argv, file_path)) {
             std::cerr << "Too many command line arguments.\n";
             print_usage(argv[0]);
             return StartupAction::exit_failure;
         }
-
-        return StartupAction::check;
-    }
-
-    if (option == "--list") {
-        if (argc == 2) {
-            file_path = "books.txt";
-        } else if (argc == 3) {
-            file_path = argv[2];
-        } else {
-            std::cerr << "Too many command line arguments.\n";
-            print_usage(argv[0]);
-            return StartupAction::exit_failure;
+        if (option == "--check") {
+            return StartupAction::check;
         }
         return StartupAction::list;
     }
