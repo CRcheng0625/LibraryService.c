@@ -294,6 +294,19 @@ set_tests_properties(
         PASS_REGULAR_EXPRESSION "total_count: 1"
 )
 
+add_test(
+    NAME LibraryCliAvailableDefaultFile
+    COMMAND library_cli --available
+)
+
+set_tests_properties(
+    LibraryCliAvailableDefaultFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "Test Book"
+        FAIL_REGULAR_EXPRESSION "Borrowed Book"
+)
+
 set_property(
     TEST
         LibraryCliVersion
@@ -316,6 +329,7 @@ set_property(
         LibraryCliCountCustomFile
         LibraryCliCountDefaultFile
         LibraryCliStatsCustomFile
+        LibraryCliAvailableDefaultFile
     PROPERTY LABELS cli
 )
 

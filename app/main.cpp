@@ -594,7 +594,7 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
 NoninteractiveResult run_noninteractive_action(cli::StartupAction startup,
                                                const std::string& file_path) {
     if (startup != cli::StartupAction::list && startup != cli::StartupAction::count &&
-        startup != cli::StartupAction::stats) {
+        startup != cli::StartupAction::stats && startup != cli::StartupAction::available) {
         return NoninteractiveResult::not_handled;
     }
 
@@ -612,6 +612,9 @@ NoninteractiveResult run_noninteractive_action(cli::StartupAction startup,
         break;
     case cli::StartupAction::stats:
         print_statistics(service.statistics());
+        break;
+    case cli::StartupAction::available:
+        list_available_books(service);
         break;
     default:
         break;

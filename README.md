@@ -178,6 +178,14 @@ GitHub Actions 会在 Linux 和 Windows 两个平台分别构建、测试并上�
 
 `--stats` 会输出总数、可借数量、已借数量和借阅率，然后直接退出。
 
+只列出当前可借的图书：
+
+```powershell
+.\build\library_cli.exe --available tests\data\custom_books.txt
+```
+
+`--available` 会读取文件并打印未借出的图书，然后直接退出；已借出的图书不会显示。
+
 数据文件格式：
 
 ```text

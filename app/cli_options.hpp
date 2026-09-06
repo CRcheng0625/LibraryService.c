@@ -10,6 +10,7 @@ enum class StartupAction {
     list,
     count,
     stats,
+    available,
     exit_success,
     exit_failure
 };
