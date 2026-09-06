@@ -18,7 +18,7 @@ void print_usage(std::string_view program_name) {
 }
 
 void print_version(std::string_view program_name) {
-    std::cout << program_name << " version " << LIBRARY_CLI_VERSION << std::endl;
+    std::cout << program_name << " version " << LIBRARY_CLI_VERSION << '\n';
 }
 
 bool parse_optional_file_path(int argc, char* argv[], std::string& file_path) {
