@@ -602,28 +602,27 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
         }
         return 1;
     }
-    if (startup == cli::StartupAction::list) {
+    if (startup == cli::StartupAction::list || startup == cli::StartupAction::count ||
+        startup == cli::StartupAction::stats) {
         library::LibraryService service;
         if (!library_io::load_library(service, file_path, false)) {
             return 1;
         }
-        list_books(service);
-        return 0;
-    }
-    if (startup == cli::StartupAction::count) {
-        library::LibraryService service;
-        if (!library_io::load_library(service, file_path, false)) {
-            return 1;
+
+        switch (startup) {
+        case cli::StartupAction::list:
+            list_books(service);
+            break;
+        case cli::StartupAction::count: 
+            std::cout << "Book count: " << service.all_books().size() << '\n';
+            break;
+        case cli::StartupAction::stats:
+            print_statistics(service.statistics());
+            break;
+        default:
+            break;
         }
-        std::cout << "Book count: " << service.all_books().size() << '\n';
-        return 0;
-    }
-    if (startup == cli::StartupAction::stats) {
-        library::LibraryService service;
-        if (!library_io::load_library(service, file_path, false)) {
-            return 1;
-        }
-        print_statistics(service.statistics());
+
         return 0;
     }
     library::LibraryService service;
