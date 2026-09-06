@@ -307,6 +307,30 @@ set_tests_properties(
         FAIL_REGULAR_EXPRESSION "Borrowed Book"
 )
 
+add_test(
+    NAME LibraryCliAvailableMissingFile
+    COMMAND library_cli --available missing_available_books.txt
+)
+
+set_tests_properties(
+    LibraryCliAvailableMissingFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "No available books"
+)
+
+add_test(
+    NAME LibraryCliAvailableEmptyFile
+    COMMAND library_cli --available empty_books.txt
+)
+
+set_tests_properties(
+    LibraryCliAvailableEmptyFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "No available books"
+)
+
 set_property(
     TEST
         LibraryCliVersion
@@ -330,6 +354,8 @@ set_property(
         LibraryCliCountDefaultFile
         LibraryCliStatsCustomFile
         LibraryCliAvailableDefaultFile
+        LibraryCliAvailableMissingFile
+        LibraryCliAvailableEmptyFile
     PROPERTY LABELS cli
 )
 
