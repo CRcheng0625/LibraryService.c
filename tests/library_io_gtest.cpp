@@ -47,3 +47,32 @@ TEST(LibraryIoTest, LoadsBooksWithoutShowingStatusWhenRequested) {
     EXPECT_TRUE(output.empty());
 }
 
+TEST(LibraryIoTest, ReportsInvalidFileWhenChecking) {
+    const std::string file_path = "library_io_gtest_invalid.txt";
+    {
+        std::ofstream output(file_path);
+        ASSERT_TRUE(output.is_open());
+        output << "not a valid book record\n";
+    }
+
+    testing::internal::CaptureStderr();
+    const bool success = library_io::check_library_file(file_path);
+    const std::string error = testing::internal::GetCapturedStderr();
+
+    std::remove(file_path.c_str());
+
+    EXPECT_FALSE(success);
+    EXPECT_NE(error.find("Books file has invalid format."), std::string::npos);
+}
+
+TEST(LibraryIoTest, ReportsMissingFileWhenChecking) {
+    const std::string file_path = "library_io_gtest_missing.txt";
+    std::remove(file_path.c_str());
+
+    testing::internal::CaptureStderr();
+    const bool success = library_io::check_library_file(file_path);
+    const std::string error = testing::internal::GetCapturedStderr();
+
+    EXPECT_FALSE(success);
+    EXPECT_NE(error.find("Books file was not found."), std::string::npos);
+}

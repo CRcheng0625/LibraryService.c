@@ -13,6 +13,8 @@ void print_usage(std::string_view program_name) {
     std::cout << "       " << program_name << " -v\n";
     std::cout << "       " << program_name << " --check [books_file]\n";
     std::cout << "       " << program_name << " --list [books_file]\n";
+    std::cout << "       " << program_name << " --count [books_file]\n";
+    std::cout << "       " << program_name << " --stats [books_file]\n";
 }
 
 void print_version(std::string_view program_name) {
@@ -46,7 +48,7 @@ StartupAction parse_command_line(int argc, char* argv[], std::string& file_path)
         return StartupAction::exit_success;
     }
 
-    if (option == "--check" || option == "--list") {
+    if (option == "--check" || option == "--list" || option == "--count" || option == "--stats") {
         if (!parse_optional_file_path(argc, argv, file_path)) {
             std::cerr << "Too many command line arguments.\n";
             print_usage(argv[0]);
@@ -55,7 +57,13 @@ StartupAction parse_command_line(int argc, char* argv[], std::string& file_path)
         if (option == "--check") {
             return StartupAction::check;
         }
-        return StartupAction::list;
+        if (option == "--list") {
+            return StartupAction::list;
+        }
+        if (option == "--stats") {
+            return StartupAction::stats;
+        }
+        return StartupAction::count;
     }
 
     if (argc == 2 && option.empty()) {

@@ -448,6 +448,19 @@ void filter_books_in_library(const library::LibraryService& service) {
     }
 }
 
+void print_statistics(const library::LibraryStats& stats) {
+    std::cout << "total_count: " << stats.total_count << '\n';
+    std::cout << "available_count: " << stats.available_count << '\n';
+    std::cout << "borrowed_count: " << stats.borrowed_count << '\n';
+
+    const double borrowed_rate = stats.total_count == 0
+                                     ? 0.0
+                                     : 100.0 * static_cast<double>(stats.borrowed_count) /
+                                           static_cast<double>(stats.total_count);
+    std::cout << std::fixed << std::setprecision(1) << "borrowed_rate: " << borrowed_rate
+              << "%\n";
+}
+
 void show_statistics(const library::LibraryService& service) {
     library::BookFilter filter;
 
@@ -493,16 +506,7 @@ void show_statistics(const library::LibraryService& service) {
 
     const bool has_filter = !title.empty() || !author.empty() || year != 0 || choice != 0;
     const auto stats = has_filter ? service.statistics(filter) : service.statistics();
-
-    std::cout << "total_count: " << stats.total_count << '\n';
-    std::cout << "available_count: " << stats.available_count << '\n';
-    std::cout << "borrowed_count: " << stats.borrowed_count << '\n';
-
-    const double borrowed_rate = stats.total_count == 0
-                                     ? 0.0
-                                     : 100.0 * static_cast<double>(stats.borrowed_count) /
-                                           static_cast<double>(stats.total_count);
-    std::cout << std::fixed << std::setprecision(1) << "borrowed_rate: " << borrowed_rate << "%\n";
+    print_statistics(stats);
 }
 
 MenuAction handle_menu_choice(int choice, library::LibraryService& service,
@@ -604,6 +608,22 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
             return 1;
         }
         list_books(service);
+        return 0;
+    }
+    if (startup == cli::StartupAction::count) {
+        library::LibraryService service;
+        if (!library_io::load_library(service, file_path, false)) {
+            return 1;
+        }
+        std::cout << "Book count: " << service.all_books().size() << '\n';
+        return 0;
+    }
+    if (startup == cli::StartupAction::stats) {
+        library::LibraryService service;
+        if (!library_io::load_library(service, file_path, false)) {
+            return 1;
+        }
+        print_statistics(service.statistics());
         return 0;
     }
     library::LibraryService service;

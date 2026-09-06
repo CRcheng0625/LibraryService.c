@@ -258,6 +258,42 @@ add_test(
         -P "${CMAKE_CURRENT_SOURCE_DIR}/tests/check_cli_output.cmake"
 )
 
+add_test(
+    NAME LibraryCliCountCustomFile
+    COMMAND library_cli --count custom_books.txt
+)
+
+set_tests_properties(
+    LibraryCliCountCustomFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "Book count: 1"
+)
+
+add_test(
+    NAME LibraryCliCountDefaultFile
+    COMMAND library_cli --count
+)
+
+set_tests_properties(
+    LibraryCliCountDefaultFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "Book count: 2"
+)
+
+add_test(
+    NAME LibraryCliStatsCustomFile
+    COMMAND library_cli --stats custom_books.txt
+)
+
+set_tests_properties(
+    LibraryCliStatsCustomFile
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "total_count: 1"
+)
+
 set_property(
     TEST
         LibraryCliVersion
@@ -277,6 +313,9 @@ set_property(
         LibraryCliListMissingFile
         LibraryCliListInvalidFile
         LibraryCliListInvalidFileOutput
+        LibraryCliCountCustomFile
+        LibraryCliCountDefaultFile
+        LibraryCliStatsCustomFile
     PROPERTY LABELS cli
 )
 

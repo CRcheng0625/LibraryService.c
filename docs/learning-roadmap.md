@@ -112,6 +112,7 @@
 - 使用 CMake `install(...)` 和 CPack 生成可交付 ZIP 包
 - 让 GitHub Actions 在 Linux 和 Windows 上分别构建、测试和打包
 - 增加 `--list [books_file]` 非交互命令及默认路径、缺失文件测试
+- 增加 `--count` 和 `--stats` 非交互命令，复用业务层统计接口
 - 使用 CTest 标签按功能筛选命令行测试
 - 使用 CMake 脚本同时验证外部程序的输出文字和退出码
 - 为应用层 `library_io` 编写 GoogleTest，验证可选状态提示

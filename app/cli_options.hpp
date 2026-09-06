@@ -8,6 +8,8 @@ enum class StartupAction {
     run,
     check,
     list,
+    count,
+    stats,
     exit_success,
     exit_failure
 };

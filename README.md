@@ -162,6 +162,22 @@ GitHub Actions 会在 Linux 和 Windows 两个平台分别构建、测试并上�
 
 `--list` 会读取指定文件并打印全部图书，然后直接退出，不进入交互菜单；省略文件路径时使用默认的 `books.txt`。
 
+统计图书数量：
+
+```powershell
+.\build\library_cli.exe --count tests\data\custom_books.txt
+```
+
+`--count` 会读取文件并输出图书总数，然后直接退出。
+
+查看图书统计：
+
+```powershell
+.\build\library_cli.exe --stats tests\data\books.txt
+```
+
+`--stats` 会输出总数、可借数量、已借数量和借阅率，然后直接退出。
+
 数据文件格式：
 
 ```text
