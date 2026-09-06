@@ -91,6 +91,11 @@ if(BUILD_TESTING)
     target_link_libraries(book_validation_gtest PRIVATE library_core GTest::gtest_main)
     gtest_discover_tests(book_validation_gtest)
 
+    add_executable(library_io_gtest tests/library_io_gtest.cpp app/library_io.cpp)
+    target_include_directories(library_io_gtest PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/app)
+    target_link_libraries(library_io_gtest PRIVATE library_core GTest::gtest_main)
+    gtest_discover_tests(library_io_gtest)
+
     add_test(NAME LibraryCliVersion COMMAND library_cli --version)
 
     set_tests_properties(LibraryCliVersion PROPERTIES

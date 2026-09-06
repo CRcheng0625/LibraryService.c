@@ -17,6 +17,7 @@
 - 启动时从 `books.txt` 读取数据，退出时保存数据
 - 使用 CTest 运行自动化测试
 - 使用 GoogleTest 编写服务层和持久化测试
+- 使用 GoogleTest 编写应用层文件操作测试
 - 使用共享的 `book_validation` 模块统一校验图书数据
 - 使用 `.clang-format` 统一 C++ 代码风格
 - 使用 clang-tidy 和 GitHub Actions 做持续检查
@@ -44,6 +45,8 @@ my first project/
 │   ├── library_service_gtest.cpp   # LibraryService 测试
 │   ├── book_storage_gtest.cpp      # 文件持久化测试
 │   ├── book_validation_gtest.cpp   # 图书校验测试
+│   ├── library_io_gtest.cpp        # 应用层文件操作测试
+│   ├── check_cli_output.cmake      # CLI 输出和退出码检查脚本
 │   └── data/                       # CLI 测试使用的固定数据文件
 │       ├── books.txt
 │       ├── custom_books.txt
@@ -183,7 +186,7 @@ id "title" "author" publication_year borrowed
 5. `app/cli_options.hpp` 与 `app/cli_option.cpp`：理解命令行参数解析。
 6. `app/library_io.hpp` 与 `app/library_io.cpp`：理解应用层如何调用文件持久化接口。
 7. `include/library/book_storage.hpp` 与 `src/book_storage.cpp`：理解文件保存和读取。
-8. `tests/library_service_gtest.cpp`、`tests/book_storage_gtest.cpp` 与 `tests/book_validation_gtest.cpp`：理解 GoogleTest 如何验证行为。
+8. `tests/library_service_gtest.cpp`、`tests/book_storage_gtest.cpp`、`tests/book_validation_gtest.cpp` 与 `tests/library_io_gtest.cpp`：理解 GoogleTest 如何验证不同层的行为。
 9. `docs/learning-roadmap.md`：按练习路线继续扩展。
 
 ## 学习原则

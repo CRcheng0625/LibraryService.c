@@ -114,6 +114,7 @@
 - 增加 `--list [books_file]` 非交互命令及默认路径、缺失文件测试
 - 使用 CTest 标签按功能筛选命令行测试
 - 使用 CMake 脚本同时验证外部程序的输出文字和退出码
+- 为应用层 `library_io` 编写 GoogleTest，验证可选状态提示
 
 练习 1 至 4 已完成。练习 5 的本地格式化、clang-tidy、跨平台 GitHub Actions 和 CPack 打包已接入，下一步重点是持续维护 CI 和编写独立功能。
 
