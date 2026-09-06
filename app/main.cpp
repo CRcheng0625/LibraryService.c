@@ -41,6 +41,12 @@ enum class MenuAction : unsigned char {
     exit_failure
 };
 
+enum class NoninteractiveResult : unsigned char {
+    not_handled,
+    success,
+    failure
+};
+
 bool read_int(int& value) {
     if (std::cin >> value) {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -585,6 +591,35 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
     return MenuAction::continue_running;
 }
 
+NoninteractiveResult run_noninteractive_action(cli::StartupAction startup,
+                                               const std::string& file_path) {
+    if (startup != cli::StartupAction::list && startup != cli::StartupAction::count &&
+        startup != cli::StartupAction::stats) {
+        return NoninteractiveResult::not_handled;
+    }
+
+    library::LibraryService service;
+    if (!library_io::load_library(service, file_path, false)) {
+        return NoninteractiveResult::failure;
+    }
+
+    switch (startup) {
+    case cli::StartupAction::list:
+        list_books(service);
+        break;
+    case cli::StartupAction::count:
+        std::cout << "Book count: " << service.all_books().size() << '\n';
+        break;
+    case cli::StartupAction::stats:
+        print_statistics(service.statistics());
+        break;
+    default:
+        break;
+    }
+
+    return NoninteractiveResult::success;
+}
+
 } // namespace
 
 int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
@@ -602,28 +637,13 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
         }
         return 1;
     }
-    if (startup == cli::StartupAction::list || startup == cli::StartupAction::count ||
-        startup == cli::StartupAction::stats) {
-        library::LibraryService service;
-        if (!library_io::load_library(service, file_path, false)) {
-            return 1;
-        }
-
-        switch (startup) {
-        case cli::StartupAction::list:
-            list_books(service);
-            break;
-        case cli::StartupAction::count: 
-            std::cout << "Book count: " << service.all_books().size() << '\n';
-            break;
-        case cli::StartupAction::stats:
-            print_statistics(service.statistics());
-            break;
-        default:
-            break;
-        }
-
+    const NoninteractiveResult noninteractive_result =
+        run_noninteractive_action(startup, file_path);
+    if (noninteractive_result == NoninteractiveResult::success) {
         return 0;
+    }
+    if (noninteractive_result == NoninteractiveResult::failure) {
+        return 1;
     }
     library::LibraryService service;
 
