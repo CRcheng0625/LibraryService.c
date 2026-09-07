@@ -591,10 +591,14 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
     return MenuAction::continue_running;
 }
 
+// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 NoninteractiveResult run_noninteractive_action(cli::StartupAction startup,
-                                               const std::string& file_path) {
+                                               const std::string& file_path,
+                                               const std::string& search_keyword) {
     if (startup != cli::StartupAction::list && startup != cli::StartupAction::count &&
-        startup != cli::StartupAction::stats && startup != cli::StartupAction::available) {
+        startup != cli::StartupAction::stats && startup != cli::StartupAction::available &&
+        startup != cli::StartupAction::search_title &&
+        startup != cli::StartupAction::search_author) {
         return NoninteractiveResult::not_handled;
     }
 
@@ -616,18 +620,38 @@ NoninteractiveResult run_noninteractive_action(cli::StartupAction startup,
     case cli::StartupAction::available:
         list_available_books(service);
         break;
+    case cli::StartupAction::search_title: {
+        const auto matches = service.search_by_title(search_keyword);
+        std::cout << "Matches: " << matches.size() << '\n';
+        for (const auto& book : matches) {
+            print_book(book);
+        }
+        break;
+    }
+    case cli::StartupAction::search_author: {
+        const auto matches = service.search_by_author(search_keyword);
+        std::cout << "Matches: " << matches.size() << '\n';
+        for (const auto& book : matches) {
+            print_book(book);
+        }
+        break;
+    }
     default:
         break;
     }
 
     return NoninteractiveResult::success;
 }
+// NOLINTEND(bugprone-easily-swappable-parameters)
 
 } // namespace
 
 int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostream owns this boundary.
     std::string file_path;
-    const cli::StartupAction startup = cli::parse_command_line(argc, argv, file_path);
+    std::string search_keyword;
+    const cli::StartupAction startup =
+        cli::parse_command_line(argc, argv, file_path, search_keyword);
+
     if (startup == cli::StartupAction::exit_success) {
         return 0;
     }
@@ -640,8 +664,10 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
         }
         return 1;
     }
+
     const NoninteractiveResult noninteractive_result =
-        run_noninteractive_action(startup, file_path);
+        run_noninteractive_action(startup, file_path, search_keyword);
+
     if (noninteractive_result == NoninteractiveResult::success) {
         return 0;
     }

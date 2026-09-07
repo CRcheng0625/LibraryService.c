@@ -1,13 +1,14 @@
 #include "library_io.hpp"
 
-#include "library/book_storage.hpp"
+#include "library/book_repository.hpp"
 
 #include <iostream>
 
 namespace library_io {
 
 bool save_library(const library::LibraryService& service, const std::string& file_path) {
-    const auto status = library::save_books_to_file(service.all_books(), file_path);
+    library::FileBookRepository repository(file_path);
+    const auto status = repository.save(service.all_books());
 
     switch (status) {
     case library::SaveStatus::success:
@@ -30,7 +31,8 @@ bool save_library(const library::LibraryService& service, const std::string& fil
 }
 
 bool load_library(library::LibraryService& service, const std::string& file_path, bool show_status) {
-    const auto result = library::load_books_from_file(file_path);
+    const library::FileBookRepository repository(file_path);
+    const auto result = repository.load();
 
     switch (result.status) {
     case library::LoadStatus::success:
@@ -62,7 +64,8 @@ bool load_library(library::LibraryService& service, const std::string& file_path
 }
 
 bool check_library_file(const std::string& file_path) {
-    const auto result = library::load_books_from_file(file_path);
+    const library::FileBookRepository repository(file_path);
+    const auto result = repository.load();
 
     switch (result.status) {
     case library::LoadStatus::success:

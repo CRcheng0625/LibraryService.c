@@ -35,6 +35,7 @@ my first project/
 ├── include/library/
 │   ├── book.hpp                    # Book 数据类型
 │   ├── book_storage.hpp            # 文件持久化接口
+│   ├── book_repository.hpp         # 存储仓库抽象接口和文件实现
 │   ├── book_validation.hpp         # 图书数据校验接口
 │   └── library_service.hpp         # 图书业务接口
 ├── src/
@@ -53,6 +54,8 @@ my first project/
 │       └── invalid/books.txt
 ├── docs/
 │   └── learning-roadmap.md         # 学习路线和练习记录
+├── database/
+│   └── schema.sql                   # MySQL 数据库和 books 表结构
 ├── CMakeLists.txt                  # CMake 构建规则
 └── CMakePresets.json               # 默认构建预设
 ```
@@ -62,9 +65,9 @@ my first project/
 ```text
 library_service.cpp ─┐
 book_storage.cpp ────┼──> library_core ───> library_cli
-book_validation.cpp ─┘                         ▲
-                                               │
-                         cli_option.cpp ───────┤
+book_validation.cpp ─┘                          ▲
+                                                │
+                         cli_option.cpp ────────┤
                          library_io.cpp ────────┘
 library_service_gtest ─┐
 book_storage_gtest ────┤
@@ -72,6 +75,10 @@ book_validation_gtest ─┴──> GoogleTest + CTest
 ```
 
 业务逻辑位于 `library_core`，命令行程序和测试程序通过 CMake 链接这个库。
+
+`BookRepository` 表示“图书保存位置”的统一接口，当前的 `FileBookRepository` 将数据保存到文本文件。后续接入 MySQL 时，可以新增 `MySqlBookRepository`，而不需要修改借书、搜索和菜单逻辑。
+
+MySQL 表结构保存在 `database/schema.sql`。在 MySQL Workbench 中打开该文件并执行，可以自动创建 `library_app` 数据库和 `books` 表；这比手动逐行输入更容易重复，也会把项目需要的数据库结构提交到 Git。
 
 ## 工具
 
@@ -185,6 +192,20 @@ GitHub Actions 会在 Linux 和 Windows 两个平台分别构建、测试并上�
 ```
 
 `--available` 会读取文件并打印未借出的图书，然后直接退出；已借出的图书不会显示。
+
+按标题关键词搜索（忽略大小写）：
+
+```powershell
+.\build\library_cli.exe --search-title "C++" tests\data\books.txt
+```
+
+按作者关键词搜索（忽略大小写）：
+
+```powershell
+.\build\library_cli.exe --search-author "Martin" tests\data\books.txt
+```
+
+这两个命令都要求提供关键词，文件路径是可选的；省略文件路径时使用默认的 `books.txt`。程序会先输出匹配数量，再输出每本匹配的图书。
 
 数据文件格式：
 

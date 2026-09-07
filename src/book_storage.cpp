@@ -1,4 +1,5 @@
 #include "library/book_storage.hpp"
+#include "library/book_repository.hpp"
 #include "library/book_validation.hpp"
 
 #include <filesystem>
@@ -66,6 +67,16 @@ LoadResult load_books_from_file(const std::string& file_path) {
     }
 
     return {std::move(books), LoadStatus::success};
+}
+
+FileBookRepository::FileBookRepository(std::string file_path) : file_path_(std::move(file_path)) {}
+
+SaveStatus FileBookRepository::save(const std::vector<Book>& books) {
+    return save_books_to_file(books, file_path_);
+}
+
+LoadResult FileBookRepository::load() const {
+    return load_books_from_file(file_path_);
 }
 
 } // namespace library

@@ -51,6 +51,11 @@ install(
     DESTINATION ${CMAKE_INSTALL_DATADIR}/first_cpp_project
 )
 
+install(
+    FILES database/schema.sql
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/first_cpp_project/database
+)
+
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_PACKAGE_NAME "first_cpp_project")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
@@ -331,6 +336,52 @@ set_tests_properties(
         PASS_REGULAR_EXPRESSION "No available books"
 )
 
+add_test(
+    NAME LibraryCliSearchTitle
+    COMMAND library_cli --search-title Test books.txt
+)
+
+set_tests_properties(
+    LibraryCliSearchTitle
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "Matches: 1"
+)
+
+add_test(
+    NAME LibraryCliSearchAuthor
+    COMMAND library_cli --search-author Author books.txt
+)
+
+set_tests_properties(
+    LibraryCliSearchAuthor
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/tests/data"
+        PASS_REGULAR_EXPRESSION "Matches: 2"
+)
+
+add_test(
+    NAME LibraryCliSearchMissingKeyword
+    COMMAND library_cli --search-title
+)
+
+set_tests_properties(
+    LibraryCliSearchMissingKeyword
+    PROPERTIES
+        WILL_FAIL TRUE
+)
+
+add_test(
+    NAME LibraryCliSearchTooManyArguments
+    COMMAND library_cli --search-author Author books.txt extra.txt
+)
+
+set_tests_properties(
+    LibraryCliSearchTooManyArguments
+    PROPERTIES
+        WILL_FAIL TRUE
+)
+
 set_property(
     TEST
         LibraryCliVersion
@@ -356,6 +407,10 @@ set_property(
         LibraryCliAvailableDefaultFile
         LibraryCliAvailableMissingFile
         LibraryCliAvailableEmptyFile
+        LibraryCliSearchTitle
+        LibraryCliSearchAuthor
+        LibraryCliSearchMissingKeyword
+        LibraryCliSearchTooManyArguments
     PROPERTY LABELS cli
 )
 

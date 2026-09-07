@@ -114,6 +114,9 @@
 - 增加 `--list [books_file]` 非交互命令及默认路径、缺失文件测试
 - 增加 `--count` 和 `--stats` 非交互命令，复用业务层统计接口
 - 增加 `--available [books_file]` 非交互命令，复用可借图书查询接口
+- 增加 `--search-title` 和 `--search-author` 非交互命令，练习必选参数、可选文件路径和结果输出
+- 增加 `BookRepository` 和 `FileBookRepository`，将业务代码与具体存储方式分离
+- 将 MySQL 数据库和 `books` 表结构保存为可重复执行的 `database/schema.sql`
 - 使用 CTest 标签按功能筛选命令行测试
 - 使用 CMake 脚本同时验证外部程序的输出文字和退出码
 - 为应用层 `library_io` 编写 GoogleTest，验证可选状态提示

@@ -1,4 +1,5 @@
 #include "library/book_storage.hpp"
+#include "library/book_repository.hpp"
 
 #include <cstdio>
 #include <fstream>
@@ -29,6 +30,21 @@ TEST(BookStorageTest, SavesAndLoadsBooks) {
     EXPECT_EQ(result.books[0].title, "C++ Primer");
     EXPECT_EQ(result.books[1].author, "Robert C. Martin");
     EXPECT_TRUE(result.books[1].borrowed);
+}
+
+TEST(BookStorageTest, FileRepositorySavesAndLoadsBooks) {
+    const std::string file_path = "storage_gtest_repository_books.txt";
+    const std::vector<library::Book> books{{1, "C++ Primer", "Stanley Lippman", 2012, false}};
+    library::FileBookRepository repository(file_path);
+
+    ASSERT_EQ(repository.save(books), library::SaveStatus::success);
+
+    const auto result = repository.load();
+    remove_file(file_path);
+
+    ASSERT_EQ(result.status, library::LoadStatus::success);
+    ASSERT_EQ(result.books.size(), 1U);
+    EXPECT_EQ(result.books.front().title, "C++ Primer");
 }
 
 TEST(BookStorageTest, ReportsMissingFile) {
