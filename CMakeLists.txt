@@ -18,7 +18,7 @@ target_include_directories(library_core
 )
 
 if(MSVC)
-    target_compile_options(library_core PRIVATE /W4 /permissive-)
+    target_compile_options(library_core PRIVATE /W4 /permissive- /EHsc)
 else()
     target_compile_options(library_core PRIVATE -Wall -Wextra -Wpedantic)
 endif()
@@ -39,7 +39,7 @@ target_link_libraries(library_cli PRIVATE library_core)
 add_executable(lookup_benchmark tools/lookup_benchmark.cpp)
 target_link_libraries(lookup_benchmark PRIVATE library_core)
 
-option(FIRST_CPP_ENABLE_MYSQL "Build the optional MySQL connection check" OFF)
+option(FIRST_CPP_ENABLE_MYSQL "Build MySQL repository support and connection check" OFF)
 
 if(FIRST_CPP_ENABLE_MYSQL)
     set(FIRST_CPP_MYSQL_CONNECTOR_DIR
@@ -53,6 +53,9 @@ if(FIRST_CPP_ENABLE_MYSQL)
     )
 
     add_executable(mysql_connection_check tools/mysql_connection_check.cpp)
+    if(MSVC)
+        target_compile_options(mysql_connection_check PRIVATE /EHsc)
+    endif()
     target_sources(mysql_connection_check PRIVATE src/mysql_book_repository.cpp)
     target_include_directories(mysql_connection_check PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -60,6 +63,9 @@ if(FIRST_CPP_ENABLE_MYSQL)
     target_link_libraries(mysql_connection_check PRIVATE library_core mysql::concpp)
 
     target_sources(library_cli PRIVATE src/mysql_book_repository.cpp)
+    if(MSVC)
+        target_compile_options(library_cli PRIVATE /EHsc)
+    endif()
     target_compile_definitions(library_cli PRIVATE FIRST_CPP_ENABLE_MYSQL)
     target_link_libraries(library_cli PRIVATE mysql::concpp)
 

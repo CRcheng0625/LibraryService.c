@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <exception>
 #include <string>
 #include <utility>
 
@@ -24,6 +25,17 @@ void wait_for_exit() {
 
 } // namespace
 
+unsigned environment_port() {
+    try {
+        const unsigned long value = std::stoul(environment_value("MYSQL_PORT", "33060"));
+        if (value <= 65535UL) {
+            return static_cast<unsigned>(value);
+        }
+    } catch (const std::exception&) {
+    }
+    return 33060U;
+}
+
 int main() {
     const std::string host = environment_value("MYSQL_HOST", "127.0.0.1");
     const std::string user = environment_value("MYSQL_USER", "root");
@@ -37,13 +49,14 @@ int main() {
 
     int exit_code = 0;
     try {
-        mysqlx::Session session(host, 33060, user, password, schema);
+        const unsigned port = environment_port();
+        mysqlx::Session session(host, port, user, password, schema);
         session.sql("SELECT 1").execute();
         std::cout << "MySQL connection succeeded.\n";
 
         library::MySqlConnectionConfig config;
         config.host = host;
-        config.port = 33060;
+        config.port = port;
         config.user = user;
         config.password = password;
         config.schema = schema;

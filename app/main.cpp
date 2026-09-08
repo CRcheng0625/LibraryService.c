@@ -6,6 +6,8 @@
 #endif
 
 #include <cstddef>
+#include <cstdlib>
+#include <exception>
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -74,6 +76,26 @@ std::string read_line(const std::string& prompt) {
     std::getline(std::cin, line);
     return line;
 }
+
+#ifdef FIRST_CPP_ENABLE_MYSQL
+std::string environment_value(const char* name, const std::string& fallback) {
+    if (const char* value = std::getenv(name); value != nullptr && *value != '\0') {
+        return value;
+    }
+    return fallback;
+}
+
+unsigned environment_port() {
+    try {
+        const unsigned long value = std::stoul(environment_value("MYSQL_PORT", "33060"));
+        if (value <= 65535UL) {
+            return static_cast<unsigned>(value);
+        }
+    } catch (const std::exception&) {
+    }
+    return 33060U;
+}
+#endif
 
 void print_menu() {
     std::cout << "\nLibrary manager\n"
@@ -673,8 +695,15 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
 #ifdef FIRST_CPP_ENABLE_MYSQL
     if (startup == cli::StartupAction::mysql) {
         library::MySqlConnectionConfig config;
-        std::cout << "MySQL password: ";
-        std::getline(std::cin, config.password);
+        config.host = environment_value("MYSQL_HOST", config.host);
+        config.port = environment_port();
+        config.user = environment_value("MYSQL_USER", config.user);
+        config.schema = environment_value("MYSQL_SCHEMA", config.schema);
+        config.password = environment_value("MYSQL_PASSWORD", "");
+        if (config.password.empty()) {
+            std::cout << "MySQL password: ";
+            std::getline(std::cin, config.password);
+        }
         repository = std::make_unique<library::MySqlBookRepository>(std::move(config));
     } else
 #else

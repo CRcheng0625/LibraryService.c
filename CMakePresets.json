@@ -19,6 +19,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "BUILD_TESTING": "OFF",
         "FIRST_CPP_ENABLE_MYSQL": "ON",
         "FIRST_CPP_MYSQL_CONNECTOR_DIR": "${sourceDir}/third_party/mysql-connector-cpp"
       }

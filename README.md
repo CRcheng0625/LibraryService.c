@@ -81,14 +81,21 @@ book_validation_gtest ─┴──> GoogleTest + CTest
 
 MySQL 表结构保存在 `database/schema.sql`。在 MySQL Workbench 中打开该文件并执行，可以自动创建 `library_app` 数据库和 `books` 表；这比手动逐行输入更容易重复，也会把项目需要的数据库结构提交到 Git。
 
-如果已经安装了 Connector/C++，可以打开可选的连接检查程序：
+如果已经安装了 Connector/C++，可以打开可选的 MySQL 模式。默认构建仍然只依赖文本文件，
+这样没有安装数据库的机器也能直接构建和运行；需要数据库时使用 `mysql-release` 预设：
 
 ```powershell
 cmake --preset mysql-release
 cmake --build --preset mysql-release --target mysql_connection_check
 ```
 
-连接检查程序从环境变量读取 `MYSQL_HOST`、`MYSQL_USER`、`MYSQL_PASSWORD` 和 `MYSQL_SCHEMA`，不会把密码写进源码。
+连接检查程序和交互式 `library_cli --mysql` 都从环境变量读取
+`MYSQL_HOST`、`MYSQL_PORT`、`MYSQL_USER`、`MYSQL_PASSWORD` 和 `MYSQL_SCHEMA`。
+其中 `MYSQL_PORT` 默认是 MySQL X Protocol 的 `33060`。不设置密码环境变量时，程序会在启动时询问密码，
+因此密码不会写进源码或 Git。执行前请先在 Workbench 中运行 `database/schema.sql`。
+
+MySQL 保存目前采用“事务内全量替换”：保存时先删除表中旧数据，再写入当前内存中的完整列表，最后提交事务。
+它适合本学习项目，逻辑简单且不会留下半套数据；真实多人系统通常会改成按 ID 增量更新，并增加用户权限和迁移工具。
 
 ## 工具
 
@@ -158,6 +165,15 @@ GitHub Actions 会在 Linux 和 Windows 两个平台分别构建、测试并上�
 .\build\library_cli.exe --help
 .\build\library_cli.exe --version
 ```
+
+启用 MySQL 构建后，可以使用数据库作为存储：
+
+```powershell
+$env:MYSQL_PASSWORD = "你的密码"
+.\build-mysql\library_cli.exe --mysql
+```
+
+`--mysql` 只在 `mysql-release` 构建中可用；默认构建会明确提示 MySQL 支持未启用。
 
 检查默认数据文件：
 
@@ -250,4 +266,6 @@ id "title" "author" publication_year borrowed
 
 ## 当前状态
 
-第一阶段学习项目已经完成，主线包含核心图书功能、组合筛选、分页、CMake 模块化、GoogleTest、CTest、Git 工作流、静态检查和文件持久化。下一阶段重点是减少提示，独立完成需求拆解、实现、测试和提交。
+第一阶段学习项目已经完成，主线包含核心图书功能、组合筛选、分页、CMake 模块化、GoogleTest、CTest、Git 工作流、静态检查、文件持久化和可选 MySQL 仓库。
+项目的功能范围现在冻结：继续添加 GUI、网络服务或更多设计模式不会显著提高学习收益。
+下一条主线应转向 `java-learning/`，按你的技术栈计划学习 Java、Maven、SQL 和 Spring Boot；这个 C++ 项目保留为可展示的基础工程样例。
