@@ -41,7 +41,8 @@ my first project/
 ├── src/
 │   ├── book_storage.cpp            # 文件读写实现
 │   ├── book_validation.cpp         # 图书数据校验实现
-│   └── library_service.cpp         # 图书业务实现
+│   ├── library_service.cpp         # 图书业务实现
+│   └── mysql_book_repository.cpp   # MySQL 存储实现（可选构建）
 ├── tests/
 │   ├── library_service_gtest.cpp   # LibraryService 测试
 │   ├── book_storage_gtest.cpp      # 文件持久化测试
@@ -79,6 +80,15 @@ book_validation_gtest ─┴──> GoogleTest + CTest
 `BookRepository` 表示“图书保存位置”的统一接口，当前的 `FileBookRepository` 将数据保存到文本文件。后续接入 MySQL 时，可以新增 `MySqlBookRepository`，而不需要修改借书、搜索和菜单逻辑。
 
 MySQL 表结构保存在 `database/schema.sql`。在 MySQL Workbench 中打开该文件并执行，可以自动创建 `library_app` 数据库和 `books` 表；这比手动逐行输入更容易重复，也会把项目需要的数据库结构提交到 Git。
+
+如果已经安装了 Connector/C++，可以打开可选的连接检查程序：
+
+```powershell
+cmake --preset mysql-release
+cmake --build --preset mysql-release --target mysql_connection_check
+```
+
+连接检查程序从环境变量读取 `MYSQL_HOST`、`MYSQL_USER`、`MYSQL_PASSWORD` 和 `MYSQL_SCHEMA`，不会把密码写进源码。
 
 ## 工具
 

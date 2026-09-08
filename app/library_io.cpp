@@ -6,8 +6,7 @@
 
 namespace library_io {
 
-bool save_library(const library::LibraryService& service, const std::string& file_path) {
-    library::FileBookRepository repository(file_path);
+bool save_library(const library::LibraryService& service, library::BookRepository& repository) {
     const auto status = repository.save(service.all_books());
 
     switch (status) {
@@ -30,8 +29,14 @@ bool save_library(const library::LibraryService& service, const std::string& fil
     return false;
 }
 
-bool load_library(library::LibraryService& service, const std::string& file_path, bool show_status) {
-    const library::FileBookRepository repository(file_path);
+bool save_library(const library::LibraryService& service, const std::string& file_path) {
+    library::FileBookRepository repository(file_path);
+    return save_library(service, repository);
+}
+
+bool load_library(library::LibraryService& service,
+                  const library::BookRepository& repository,
+                  bool show_status) {
     const auto result = repository.load();
 
     switch (result.status) {
@@ -61,6 +66,11 @@ bool load_library(library::LibraryService& service, const std::string& file_path
     }
 
     return false;
+}
+
+bool load_library(library::LibraryService& service, const std::string& file_path, bool show_status) {
+    const library::FileBookRepository repository(file_path);
+    return load_library(service, repository, show_status);
 }
 
 bool check_library_file(const std::string& file_path) {

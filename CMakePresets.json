@@ -10,12 +10,28 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
+    },
+    {
+      "name": "mysql-release",
+      "displayName": "Release build with MySQL connector",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-mysql",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "FIRST_CPP_ENABLE_MYSQL": "ON",
+        "FIRST_CPP_MYSQL_CONNECTOR_DIR": "${sourceDir}/third_party/mysql-connector-cpp"
+      }
     }
   ],
   "buildPresets": [
     {
       "name": "default",
       "configurePreset": "default"
+    },
+    {
+      "name": "mysql-release",
+      "configurePreset": "mysql-release"
     }
   ],
   "testPresets": [
@@ -28,4 +44,3 @@
     }
   ]
 }
-

@@ -4,10 +4,29 @@
 #include <fstream>
 #include <gtest/gtest.h>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace {
 
 const char* const test_file_path = "library_io_gtest_books.txt";
+
+class MemoryBookRepository final : public library::BookRepository {
+  public:
+    explicit MemoryBookRepository(std::vector<library::Book> books) : books_(std::move(books)) {}
+
+    library::SaveStatus save(const std::vector<library::Book>& books) override {
+        books_ = books;
+        return library::SaveStatus::success;
+    }
+
+    library::LoadResult load() const override {
+        return {books_, library::LoadStatus::success};
+    }
+
+  private:
+    std::vector<library::Book> books_;
+};
 
 void write_test_file() {
     std::ofstream output(test_file_path);
@@ -16,6 +35,20 @@ void write_test_file() {
 }
 
 } // namespace
+
+TEST(LibraryIoTest, LoadsBooksThroughRepositoryInterface) {
+    MemoryBookRepository repository({{1, "Memory Book", "Test Author", 2024, false}});
+    library::LibraryService service;
+
+    testing::internal::CaptureStdout();
+    const bool success = library_io::load_library(service, repository, false);
+    const std::string output = testing::internal::GetCapturedStdout();
+
+    ASSERT_TRUE(success);
+    ASSERT_EQ(service.all_books().size(), 1U);
+    EXPECT_EQ(service.all_books().front().title, "Memory Book");
+    EXPECT_TRUE(output.empty());
+}
 
 TEST(LibraryIoTest, LoadsBooksAndShowsStatusByDefault) {
     write_test_file();

@@ -39,6 +39,33 @@ target_link_libraries(library_cli PRIVATE library_core)
 add_executable(lookup_benchmark tools/lookup_benchmark.cpp)
 target_link_libraries(lookup_benchmark PRIVATE library_core)
 
+option(FIRST_CPP_ENABLE_MYSQL "Build the optional MySQL connection check" OFF)
+
+if(FIRST_CPP_ENABLE_MYSQL)
+    set(FIRST_CPP_MYSQL_CONNECTOR_DIR
+        "${CMAKE_CURRENT_SOURCE_DIR}/third_party/mysql-connector-cpp"
+        CACHE PATH "MySQL Connector/C++ installation directory"
+    )
+
+    find_package(mysql-concpp CONFIG REQUIRED
+        PATHS "${FIRST_CPP_MYSQL_CONNECTOR_DIR}"
+        NO_DEFAULT_PATH
+    )
+
+    add_executable(mysql_connection_check tools/mysql_connection_check.cpp)
+    target_sources(mysql_connection_check PRIVATE src/mysql_book_repository.cpp)
+    target_include_directories(mysql_connection_check PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+    target_link_libraries(mysql_connection_check PRIVATE library_core mysql::concpp)
+
+    add_custom_command(TARGET mysql_connection_check POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MYSQL_CONCPP_RUNTIME_LIBRARY_DIR}"
+            "$<TARGET_FILE_DIR:mysql_connection_check>"
+    )
+endif()
+
 include(GNUInstallDirs)
 
 install(

@@ -1,4 +1,5 @@
 build/
+build-*/
 books.txt
 !tests/data/
 !tests/data/books.txt
@@ -11,6 +12,8 @@ out/
 .agents/
 .codex/
 cmake-build-*/
+CMakeFiles/
+third_party/
 *.user
 *.suo
 *.obj
