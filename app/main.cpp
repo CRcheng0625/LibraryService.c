@@ -1,11 +1,15 @@
 #include "library/library_service.hpp"
 #include "cli_options.hpp"
 #include "library_io.hpp"
+#ifdef FIRST_CPP_ENABLE_MYSQL
+#include "library/book_repository.hpp"
+#endif
 
 #include <cstddef>
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -516,10 +520,10 @@ void show_statistics(const library::LibraryService& service) {
 }
 
 MenuAction handle_menu_choice(int choice, library::LibraryService& service,
-                              const std::string& file_path) {
+                              library::BookRepository& repository) {
     switch (static_cast<MenuChoice>(choice)) {
     case MenuChoice::exit:
-        return library_io::save_library(service, file_path) ? MenuAction::exit_success
+        return library_io::save_library(service, repository) ? MenuAction::exit_success
                                                 : MenuAction::exit_failure;
     case MenuChoice::list_books:
         list_books(service);
@@ -579,7 +583,7 @@ MenuAction handle_menu_choice(int choice, library::LibraryService& service,
         show_statistics(service);
         break;
     case MenuChoice::save_now:
-        if (library_io::save_library(service, file_path)) {
+        if (library_io::save_library(service, repository)) {
             std::cout << "Books saved.\n";
         }
         break;
@@ -665,6 +669,24 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
         return 1;
     }
 
+    std::unique_ptr<library::BookRepository> repository;
+#ifdef FIRST_CPP_ENABLE_MYSQL
+    if (startup == cli::StartupAction::mysql) {
+        library::MySqlConnectionConfig config;
+        std::cout << "MySQL password: ";
+        std::getline(std::cin, config.password);
+        repository = std::make_unique<library::MySqlBookRepository>(std::move(config));
+    } else
+#else
+    if (startup == cli::StartupAction::mysql) {
+        std::cerr << "MySQL support is disabled in this build.\n";
+        return 1;
+    } else
+#endif
+    {
+        repository = std::make_unique<library::FileBookRepository>(file_path);
+    }
+
     const NoninteractiveResult noninteractive_result =
         run_noninteractive_action(startup, file_path, search_keyword);
 
@@ -676,7 +698,7 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
     }
     library::LibraryService service;
 
-    if (!library_io::load_library(service, file_path)) {
+    if (!library_io::load_library(service, *repository)) {
         return 1;
     }
 
@@ -685,13 +707,13 @@ int main(int argc, char* argv[]) { // NOLINT(bugprone-exception-escape): iostrea
         int choice{};
         if (!read_int(choice)) {
             if (std::cin.eof()) {
-                return library_io::save_library(service, file_path) ? 0 : 1;
+                return library_io::save_library(service, *repository) ? 0 : 1;
             }
 
             continue;
         }
 
-        const MenuAction action = handle_menu_choice(choice, service, file_path);
+        const MenuAction action = handle_menu_choice(choice, service, *repository);
 
         if (action == MenuAction::exit_success) {
             return 0;

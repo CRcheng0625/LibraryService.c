@@ -59,6 +59,16 @@ if(FIRST_CPP_ENABLE_MYSQL)
     )
     target_link_libraries(mysql_connection_check PRIVATE library_core mysql::concpp)
 
+    target_sources(library_cli PRIVATE src/mysql_book_repository.cpp)
+    target_compile_definitions(library_cli PRIVATE FIRST_CPP_ENABLE_MYSQL)
+    target_link_libraries(library_cli PRIVATE mysql::concpp)
+
+    add_custom_command(TARGET library_cli POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${MYSQL_CONCPP_RUNTIME_LIBRARY_DIR}"
+            "$<TARGET_FILE_DIR:library_cli>"
+    )
+
     add_custom_command(TARGET mysql_connection_check POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${MYSQL_CONCPP_RUNTIME_LIBRARY_DIR}"

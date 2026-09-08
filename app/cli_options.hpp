@@ -11,6 +11,7 @@ enum class StartupAction {
     count,
     stats,
     available,
+    mysql,
     search_title,
     search_author,
     exit_success,

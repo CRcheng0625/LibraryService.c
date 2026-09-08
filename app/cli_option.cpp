@@ -16,6 +16,7 @@ void print_usage(std::string_view program_name) {
     std::cout << "       " << program_name << " --count [books_file]\n";
     std::cout << "       " << program_name << " --stats [books_file]\n";
     std::cout << "       " << program_name << " --available [books_file]\n";
+    std::cout << "       " << program_name << " --mysql\n";
     std::cout << "       " << program_name << " --search-title <keyword> [books_file]\n";
     std::cout << "       " << program_name << " --search-author <keyword> [books_file]\n";
 }
@@ -76,6 +77,10 @@ StartupAction parse_command_line(int argc, char* argv[], std::string& file_path,
     if (argc == 2 && (option == "--version" || option == "-v")) {
         print_version(argv[0]);
         return StartupAction::exit_success;
+    }
+
+    if (argc == 2 && option == "--mysql") {
+        return StartupAction::mysql;
     }
 
     if (option == "--check" || option == "--list" || option == "--count" || option == "--stats" ||
